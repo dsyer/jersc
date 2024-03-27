@@ -36,6 +36,13 @@ public class VerifiedData {
 	public int length() {
 		return data.length;
 	}
+	public void reverify() {
+		try {
+			this.hash = MessageDigest.getInstance("MD5").digest(data);
+		} catch (NoSuchAlgorithmException e) {
+			throw new IllegalStateException(e);
+		}
+	}
 	@Override
 	public String toString() {
 		HexFormat format = HexFormat.of();

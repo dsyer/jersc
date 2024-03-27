@@ -2,6 +2,7 @@ package com.example;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 
 public class SaveGame {
 
@@ -28,12 +29,15 @@ public class SaveGame {
 			this.index = slotIndex;
 			this.active = data.get(CHAR_ACTIVE_STATUS_START_INDEX + slotIndex) == 1 ? true : false;
 			byte[] name = new byte[CHAR_NAME_LENGTH];
-			data.get(SAVE_HEADER_START_INDEX + (slotIndex * SAVE_HEADER_LENGTH), name);
+			data.get(getSaveDataOffset(), name);
 			this.characterName = new String(name, StandardCharsets.UTF_16LE).trim();
-			this.characterLevel = data.getInt(SAVE_HEADER_START_INDEX + (slotIndex * SAVE_HEADER_LENGTH) + CHAR_LEVEL_LOCATION);
-			this.secondsPlayed = data.getInt(SAVE_HEADER_START_INDEX + (slotIndex * SAVE_HEADER_LENGTH) + CHAR_PLAYED_START_INDEX);
-			this.saveData = VerifiedData.from(data, SLOT_START_INDEX + (slotIndex * 0x10) + (slotIndex * SLOT_LENGTH), SLOT_LENGTH);
-			data.get(SAVE_HEADER_START_INDEX + (slotIndex * SAVE_HEADER_LENGTH), this.headerData);
+			this.characterLevel = data
+					.getInt(SAVE_HEADER_START_INDEX + (slotIndex * SAVE_HEADER_LENGTH) + CHAR_LEVEL_LOCATION);
+			this.secondsPlayed = data
+					.getInt(SAVE_HEADER_START_INDEX + (slotIndex * SAVE_HEADER_LENGTH) + CHAR_PLAYED_START_INDEX);
+			this.saveData = VerifiedData.from(data, SLOT_START_INDEX + (slotIndex * 0x10) + (slotIndex * SLOT_LENGTH),
+					SLOT_LENGTH);
+			data.get(getHeaderDataOffset(), this.headerData);
 			return true;
 		} catch (Exception e) {
 			return false;
@@ -42,8 +46,10 @@ public class SaveGame {
 
 	@Override
 	public String toString() {
-		return "SaveGame [index=" + index + ", active=" + active + ", characterName=" + characterName + ", characterLevel=" + characterLevel
-				+ ", secondsPlayed=" + secondsPlayed + ", saveData=" + saveData + ", headerData=" + headerData.length+ "]";
+		return "SaveGame [index=" + index + ", active=" + active + ", characterName=" + characterName
+				+ ", characterLevel=" + characterLevel
+				+ ", secondsPlayed=" + secondsPlayed + ", saveData=" + saveData + ", headerData=" + headerData.length
+				+ "]";
 	}
 
 	public static SaveGame from(ByteBuffer data, int slotIndex) {
@@ -53,6 +59,14 @@ public class SaveGame {
 		} else {
 			return null;
 		}
+	}
+
+	public int getSaveDataOffset() {
+		return SAVE_HEADER_START_INDEX + (index * SAVE_HEADER_LENGTH);
+	}
+
+	public int getHeaderDataOffset() {
+		return SAVE_HEADER_START_INDEX + (index * SAVE_HEADER_LENGTH);
 	}
 
 	public int getIndex() {
@@ -86,4 +100,42 @@ public class SaveGame {
 	public int length() {
 		return saveData.length() + headerData.length;
 	}
+
+	public void setCharacterName(String characterName) {
+		this.characterName = characterName;
+		byte[] name = characterName.getBytes(StandardCharsets.UTF_16LE);
+		System.arraycopy(name, 0, saveData.getData(), 0, name.length);
+		saveData.reverify();
+	}
+
+	public void setIndex(int slot) {
+		this.index = slot;
+	}
+
+	public String prettyPrint() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("Slot=").append(index).append(": ").append(characterName).append("=");
+		builder.append("[Level=").append(characterLevel).append(",");
+		builder.append("Played=").append(secondsPlayed).append("s]");
+		return builder.toString();
+	}
+
+	public SaveGame copy() {
+		SaveGame copy = new SaveGame();
+		copy.index = this.index;
+		copy.active = this.active;
+		copy.characterName = this.characterName;
+		copy.characterLevel = this.characterLevel;
+		copy.secondsPlayed = this.secondsPlayed;
+		copy.saveData = this.saveData;
+		copy.headerData = this.headerData;
+		return copy;
+	}
+
+	public SaveGame named(String name) {
+		SaveGame copy = copy();
+		copy.setCharacterName(name);
+		return copy;
+	}
+
 }
