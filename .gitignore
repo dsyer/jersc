@@ -1,4 +1,5 @@
 *.sl2
+*.sl2.*
 
 HELP.md
 target/

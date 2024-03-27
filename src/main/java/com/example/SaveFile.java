@@ -6,7 +6,6 @@ import java.nio.ByteOrder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.function.IntPredicate;
 import java.util.stream.Collectors;
 
 public class SaveFile {
@@ -52,6 +51,14 @@ public class SaveFile {
 		}
 	}
 
+	public void save(Path path) {
+		try {
+			Files.write(path, data.array());
+		} catch (IOException e) {
+			throw new IllegalStateException(e);
+		}
+	}
+	
 	public static SaveFile from(ByteBuffer data) {
 		SaveFile file = new SaveFile();
 		if (file.load(data)) {
@@ -88,7 +95,7 @@ public class SaveFile {
 		// Copy data to buffer
 		this.data.put(existing.getSaveDataOffset(), game.getSaveData().getData());
 		// Including hash
-		this.data.put(game.getSaveData().getStart() - 16, game.getSaveData().getHash());
+		this.data.put(existing.getSaveDataOffset() - 16, game.getSaveData().getHash());
 		// Copy header data
 		this.data.put(existing.getHeaderDataOffset(), game.getHeaderData());
 		// Recompute hash
@@ -161,4 +168,22 @@ public class SaveFile {
 		}
 		return builder.toString();
 	}
+
+	public SaveFile copy() {
+		SaveFile copy = new SaveFile();
+		copy.id = id;
+		copy.idBytes = Arrays.copyOf(idBytes, idBytes.length);
+		copy.idLocations = Arrays.copyOf(idLocations, idLocations.length);
+		copy.data = ByteBuffer.allocate(data.capacity()).order(data.order());
+		copy.data.put(data.array());
+		copy.games = new SaveGame[games.length];
+		for (int i = 0; i < games.length; i++) {
+			if (games[i] != null) {
+				copy.games[i] = games[i].copy();
+			}
+		}
+		copy.saveHeaders = saveHeaders.copy();
+		return copy;
+	}
+
 }

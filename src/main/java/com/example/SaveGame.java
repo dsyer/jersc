@@ -2,7 +2,7 @@ package com.example;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import java.time.Duration;
+import java.util.Arrays;
 
 public class SaveGame {
 
@@ -29,14 +29,11 @@ public class SaveGame {
 			this.index = slotIndex;
 			this.active = data.get(CHAR_ACTIVE_STATUS_START_INDEX + slotIndex) == 1 ? true : false;
 			byte[] name = new byte[CHAR_NAME_LENGTH];
-			data.get(getSaveDataOffset(), name);
+			data.get(getHeaderDataOffset(), name);
 			this.characterName = new String(name, StandardCharsets.UTF_16LE).trim();
-			this.characterLevel = data
-					.getInt(SAVE_HEADER_START_INDEX + (slotIndex * SAVE_HEADER_LENGTH) + CHAR_LEVEL_LOCATION);
-			this.secondsPlayed = data
-					.getInt(SAVE_HEADER_START_INDEX + (slotIndex * SAVE_HEADER_LENGTH) + CHAR_PLAYED_START_INDEX);
-			this.saveData = VerifiedData.from(data, SLOT_START_INDEX + (slotIndex * 0x10) + (slotIndex * SLOT_LENGTH),
-					SLOT_LENGTH);
+			this.characterLevel = data.getInt(getHeaderDataOffset() + CHAR_LEVEL_LOCATION);
+			this.secondsPlayed = data.getInt(getHeaderDataOffset() + CHAR_PLAYED_START_INDEX);
+			this.saveData = VerifiedData.from(data, getSaveDataOffset(), SLOT_LENGTH);
 			data.get(getHeaderDataOffset(), this.headerData);
 			return true;
 		} catch (Exception e) {
@@ -62,7 +59,7 @@ public class SaveGame {
 	}
 
 	public int getSaveDataOffset() {
-		return SAVE_HEADER_START_INDEX + (index * SAVE_HEADER_LENGTH);
+		return SLOT_START_INDEX + (index * 0x10) + (index * SLOT_LENGTH);
 	}
 
 	public int getHeaderDataOffset() {
@@ -102,9 +99,14 @@ public class SaveGame {
 	}
 
 	public void setCharacterName(String characterName) {
-		this.characterName = characterName;
+		this.characterName = characterName.trim();
 		byte[] name = characterName.getBytes(StandardCharsets.UTF_16LE);
-		System.arraycopy(name, 0, saveData.getData(), 0, name.length);
+		while (name.length > CHAR_NAME_LENGTH) {
+			name = characterName.substring(0, characterName.length() - 1).getBytes(StandardCharsets.UTF_16LE);
+		}
+		byte[] data = new byte[CHAR_NAME_LENGTH];
+		System.arraycopy(name, 0, data, 0, name.length);
+		System.arraycopy(data, 0, headerData, 0, data.length);
 		saveData.reverify();
 	}
 
@@ -127,8 +129,8 @@ public class SaveGame {
 		copy.characterName = this.characterName;
 		copy.characterLevel = this.characterLevel;
 		copy.secondsPlayed = this.secondsPlayed;
-		copy.saveData = this.saveData;
-		copy.headerData = this.headerData;
+		copy.saveData = this.saveData.copy();
+		copy.headerData = Arrays.copyOf(this.headerData, this.headerData.length);
 		return copy;
 	}
 

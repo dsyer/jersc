@@ -3,6 +3,7 @@ package com.example;
 import java.nio.ByteBuffer;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.HexFormat;
 
 public class VerifiedData {
@@ -47,5 +48,13 @@ public class VerifiedData {
 	public String toString() {
 		HexFormat format = HexFormat.of();
 		return "VerifiedData [hash=" + format.formatHex(hash) + ", data=[" + Integer.toHexString(start) + "," + data.length + "], verified=" + isVerified() + "]";
+	}
+
+	public VerifiedData copy() {
+		VerifiedData copy = new VerifiedData();
+		copy.start = start;
+		copy.hash = Arrays.copyOf(hash, hash.length);
+		copy.data = Arrays.copyOf(data, data.length);
+		return copy;
 	}
 }
