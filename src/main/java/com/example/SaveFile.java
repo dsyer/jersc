@@ -77,6 +77,8 @@ public class SaveFile {
 		for (int location : idLocations) {
 			data.put(location, bytes);
 		}
+		// Need to refresh save games if they have id data embedded
+		load(data);
 		return this;
 	}
 

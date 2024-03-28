@@ -41,25 +41,25 @@ public class DemoApplication {
 		SaveFile result;
 		if (output.exists()) {
 			System.out.println("File " + output + " already exists.");
-			result = SaveFile.from(output.toPath());
-			if (result != null) {
-				System.out.println(result.prettyPrint());
-			} else {
-				System.out.print("Do you want to overwrite this file (Y/n)? ");
-				line = scanner.nextLine();
-				if (!line.isEmpty()) {
-					if (line.toLowerCase().charAt(0) == 'n') {
-						return;
-					}
+			System.out.print("Do you want to overwrite this file (Y/n)? ");
+			line = scanner.nextLine();
+			if (!line.isEmpty()) {
+				if (line.toLowerCase().charAt(0) == 'n') {
+					return;
 				}
+			}
+			result = SaveFile.from(output.toPath());
+			if (result == null) {
 				result = save.copy();
 			}
 		} else {
 			result = save.copy();
 		}
-		System.out.print("Which slot do you want to copy from " + activeSlots(save) + "? ");
+		save.changeId(result.getId());
+		List<Integer> activeSlots = activeSlots(save);
+		System.out.print("Which slot do you want to copy from " + activeSlots + "? ");
 		line = scanner.nextLine();
-		int slot = 0;
+		int slot = activeSlots.isEmpty() ? 0 : activeSlots.get(0);
 		if (!line.isEmpty()) {
 			slot = Integer.parseInt(line);
 			if (slot < 0 || slot >= save.getGames().length || !save.getGames()[slot].isActive()) {
