@@ -10,10 +10,10 @@
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.example</groupId>
-	<artifactId>demo</artifactId>
+	<artifactId>jersc</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>demo</name>
-	<description>Demo project for Spring Boot</description>
+	<name>jersc</name>
+	<description>Elden Ring save copier CLI</description>
 	<properties>
 		<start-class>com.example.DemoApplication</start-class>
 		<java.version>17</java.version>
