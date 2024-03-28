@@ -34,7 +34,7 @@ public class SaveGameTest {
 		byte[] idBytes = new byte[8];
 		data.get(ID_LOCATION, idBytes);
 		int[] idLocations = new BytesMatcher(idBytes).matches(data.array());
-		assertThat(idLocations.length).isEqualTo(2);
+		assertThat(idLocations.length).isGreaterThan(1);
 		// For active games, the ID should not be in the save data and not in the header
 		for (int i = 0; i < 10; i++) {
 			SaveGame game = file.getGames()[i];

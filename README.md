@@ -10,7 +10,7 @@ You can also download other player's save files from the internet and copy their
 
 ## Installation
 
-Build the project with `./mvnw package`. You can run it with `java -jar target/*.jar` or compile it to a native image with GraalVM using `native-image -o jersc -jar target/*.jar`. The native image will be faster to start up and use less memory. The tests will be skipped unless there is a valid save file in the current directory.
+Build the project with `./mvnw package`. You can run it with `java -jar target/*-exec.jar` or compile it to a native image with GraalVM using `native-image -o jersc -jar target/*-exec.jar`. The native image will be faster to start up and use less memory. The tests will be skipped unless there is a valid save file in the current directory.
 
 ## Usage
 

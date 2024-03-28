@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.nio.file.Paths;
+import java.util.Arrays;
 
 import org.junit.jupiter.api.Test;
 
@@ -22,15 +23,17 @@ public class SaveFileTest {
 		assumeTrue(Paths.get("ER0000.sl2").toFile().exists(), "File does not exist");
 		SaveFile file = SaveFile.from(Paths.get("ER0000.sl2"));
 		int activeGameCount = file.getActiveCount();
-		SaveGame game = file.getGames()[0].named("TestCharacter");
-		file.replaceSlot(file.findInactive(), game);
+		SaveGame game = Arrays.asList(file.getGames()).stream().filter(g -> g != null && g.isActive())
+			.findFirst().get().named("TestCharacter");
+		int inactive = file.findInactive();
+		file.replaceSlot(inactive, game);
 		assertThat(file.validate()).isTrue();
 		System.err.println(file.prettyPrint());
 		assertThat(file.getGames()[0].getIndex()).isEqualTo(0);
-		SaveGame saved = file.getGames()[file.getActiveCount()-1];
+		SaveGame saved = file.getGames()[inactive];
 		assertThat(saved.getCharacterName()).isEqualTo("TestCharacter");
 		assertThat(saved.isActive()).isTrue();
-		assertThat(saved.getIndex()).isEqualTo(file.getActiveCount()-1);
+		assertThat(saved.getIndex()).isEqualTo(inactive);
 		assertThat(file.getActiveCount()).isEqualTo(activeGameCount + 1);
 		assertThat(file.validate()).isTrue();
 	}
