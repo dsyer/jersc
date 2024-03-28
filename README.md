@@ -4,11 +4,13 @@ This project is a library and command line application (written in Java) for rea
 
 Locate your save file and (optionally) copy it to an empty directory. The save file from the game is `ER0000.sl2` typically located in a folder called `AppData/Roaming/EldenRing/<steamid>`. On Windows you can usually find it at `C:\Users\<username>/` and on Steam Deck it will be in a Proton virtual drive `/home/deck/.steam/steam/steamapps/compatdata/1245620/pfx/drive_c/users/steamuser/`. The `steamid` is a 17-digit number that corresponds to your Steam account - you can see it in your profile details in the Steam web UI at https://store.steampowered.com/account/ - and `1245620` is a unique identifier for Elden Ring. The `ER0000.sl2` file is a binary file that contains your character slots.
 
+You don't have to run the Save Copier on the same machine as where you play the game. Steam Decks are fine for running Java but if you want to develop new features it might be easier to copy the file over. What I do with my Steam Deck is [enable SSH](https://shendrick.net/Gaming/2022/05/30/sshonsteamdeck.html) and then copy the save file to my laptop with `scp`. You can also use a USB stick to copy the file between the Steam Deck and your computer.
+
 You can also download other player's save files from the internet and copy their characters into your save file (e.g. at [Nexusmods](https://www.nexusmods.com/eldenring/mods/categories/10/)). This is useful for trying out different builds or for recovering a lost character. You can also use it to copy your characters between different computers or operating systems.
 
 ## Installation
 
-Build the project with `./mvnw package`. You can run it with `java -jar target/*.jar` or compile it to a native image with GraalVM using `native-image -o jersc -jar target/*.jar`. The native image will be faster to start up and use less memory.
+Build the project with `./mvnw package`. You can run it with `java -jar target/*.jar` or compile it to a native image with GraalVM using `native-image -o jersc -jar target/*.jar`. The native image will be faster to start up and use less memory. The tests will be skipped unless there is a valid save file in the current directory.
 
 ## Usage
 
