@@ -13,8 +13,8 @@ public class SaveFile {
 	private static final int SAVE_FILE_LENGTH = 26614296;
 
 	private static final int ID_LOCATION = 0x19003B4;
-	public static final int SAVE_HEADERS_SECTION_START_INDEX = 0x19003B0;
-	public static final int SAVE_HEADERS_SECTION_LENGTH = 0x60000;
+	private static final int SAVE_HEADERS_SECTION_START_INDEX = 0x19003B0;
+	private static final int SAVE_HEADERS_SECTION_LENGTH = 0x60000;
 
 	private SaveGame[] games = new SaveGame[10];
 	private VerifiedData saveHeaders = new VerifiedData();
@@ -69,6 +69,9 @@ public class SaveFile {
 	}
 
 	public SaveFile changeId(long id) {
+		if (this.id == id) {
+			return this;
+		}
 		this.id = id;
 		ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES);
 		buffer.order(ByteOrder.LITTLE_ENDIAN);
