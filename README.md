@@ -2,7 +2,9 @@
 
 This project is a library and command line application (written in Java) for reading and copying Elden Ring save files. It is useful for copying characters between save files or slots. The save file is a binary file that contains your character slots. The application can read and write these files, and it can also copy characters between slots or files.
 
-Locate your save file and (optionally) copy it to an empty directory. The save file is `ER0000.sl2` typically located in a folder called `AppData/Roaming/EldenRing/<steamid>`. On Windows you can usually find it at `C:\Users\<username>/` and on Steam Deck it will be in a Proton virtual drive `/home/deck/.steam/steam/steamapps/compatdata/1245620/pfx/drive_c/users/steamuser/`. The `steamid` is a 17-digit number that corresponds to your Steam account - you can see it in your profile details in the Steam web UI at https://store.steampowered.com/account/ - and `1245620` is a unique identifier for Elden Ring. The `ER0000.sl2` file is a binary file that contains your character slots.
+Locate your save file and (optionally) copy it to an empty directory. The save file from the game is `ER0000.sl2` typically located in a folder called `AppData/Roaming/EldenRing/<steamid>`. On Windows you can usually find it at `C:\Users\<username>/` and on Steam Deck it will be in a Proton virtual drive `/home/deck/.steam/steam/steamapps/compatdata/1245620/pfx/drive_c/users/steamuser/`. The `steamid` is a 17-digit number that corresponds to your Steam account - you can see it in your profile details in the Steam web UI at https://store.steampowered.com/account/ - and `1245620` is a unique identifier for Elden Ring. The `ER0000.sl2` file is a binary file that contains your character slots.
+
+You can also download other player's save files from the internet and copy their characters into your save file (e.g. at [Nexusmods](https://www.nexusmods.com/eldenring/mods/categories/10/)). This is useful for trying out different builds or for recovering a lost character. You can also use it to copy your characters between different computers or operating systems.
 
 ## Installation
 
