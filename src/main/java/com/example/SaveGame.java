@@ -1,6 +1,7 @@
 package com.example;
 
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Set;
@@ -163,8 +164,9 @@ public class SaveGame {
 				id[1] = slice[1];
 				if (slice[2] == 0 && slice[3] == (byte)0xB0) { // or 0x80, 0x80?
 					Item item = Items.DEFAULT.find(id);
+					ByteBuffer wrapper = ByteBuffer.wrap(slice).order(ByteOrder.LITTLE_ENDIAN);
 					if (item !=null) {
-						list.add(new ItemData(item, slice[4], offset, slice));
+						list.add(new ItemData(item, wrapper.getShort(4), offset, slice));
 					}
 				}
 				offset = offset + 12;

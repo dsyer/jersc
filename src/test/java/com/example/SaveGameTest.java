@@ -9,6 +9,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 
 import org.junit.jupiter.api.Test;
 
@@ -31,8 +32,11 @@ public class SaveGameTest {
 		SaveFile file = SaveFile.from(Paths.get("ER0000.sl2"));
 		SaveGame game = file.getGames()[0];
 		assertThat(game.getInventory()).isNotEmpty();
-		assertThat(game.getInventory()[0].quantity()).isLessThan(999);
-		assertThat(game.getInventory()[0].quantity()).isGreaterThan(0);
+		for (ItemData data : game.getInventory()) {
+			// System.err.println(data.item() + " " + data.quantity() + " " + Arrays.toString(data.data()));
+			assertThat(data.quantity()).isLessThan(1000);
+			assertThat(data.quantity()).isGreaterThan(0);
+		}
 	}
 
 	@Test
