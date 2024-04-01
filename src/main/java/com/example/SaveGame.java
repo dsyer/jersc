@@ -150,13 +150,17 @@ public class SaveGame {
 		}
 		Set<ItemData> list = new TreeSet<>();
 		BytesMatcher finger = new BytesMatcher(new byte[]{106, 0, 0, (byte) 0xB0, 0x01});
+		// There's always a Tarnished Wizened Finger [106, 0]
+		// but it's not always in the same place, so find it...
 		int offset  = finger.match(saveData.getData(), 0, saveData.length());
 		if (offset >=0) {
 			ByteBuffer data = ByteBuffer.wrap(saveData.getData());
-			offset = offset - 12*1024;
+			offset = offset - 12*1024; // each item occupies 12 bytes
 			if (offset < 0) {offset = 0;}
+			// ... and then start scanning for other known items
 			data.position(offset);
-			for (int pointer = 0; pointer<2048; pointer++) {
+			// Check a maximum of 2048 potential items.
+			for (int pointer = 0; pointer < 2048; pointer++) {
 				byte[] slice = new byte[12];
 				byte[] id = new byte[2];
 				data.get(slice);
@@ -164,13 +168,14 @@ public class SaveGame {
 				id[1] = slice[1];
 				if (slice[2] == 0 && slice[3] == (byte)0xB0) { // or 0x80, 0x80?
 					Item item = Items.DEFAULT.find(id);
-					ByteBuffer wrapper = ByteBuffer.wrap(slice).order(ByteOrder.LITTLE_ENDIAN);
 					if (item !=null) {
+						// We found a known item, so extract the quantity
+						ByteBuffer wrapper = ByteBuffer.wrap(slice).order(ByteOrder.LITTLE_ENDIAN);
 						list.add(new ItemData(item, wrapper.getShort(4), offset, slice));
 					}
 				}
-				offset = offset + 12;
-				if (offset > saveData.length()) {
+				// Move to the next item potential location
+				if (data.position() > saveData.length()) {
 					break;
 				}
 			}
