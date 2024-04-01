@@ -31,7 +31,7 @@ public class SaveGameTest {
 		assumeTrue(Paths.get("ER0000.sl2").toFile().exists(), "File does not exist");
 		SaveFile file = SaveFile.from(Paths.get("ER0000.sl2"));
 		SaveGame game = file.getGames()[0];
-		assertThat(game.getInventory()).isNotEmpty();
+		assertThat(game.getInventory()).hasSizeGreaterThan(1);
 		for (ItemData data : game.getInventory()) {
 			// System.err.println(data.item() + " " + data.quantity() + " " + Arrays.toString(data.data()));
 			assertThat(data.quantity()).isLessThan(1000);
