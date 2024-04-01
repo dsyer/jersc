@@ -3,6 +3,8 @@ package com.example;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Set;
+import java.util.TreeSet;
 
 public class SaveGame {
 
@@ -23,6 +25,7 @@ public class SaveGame {
 	private long secondsPlayed;
 	private VerifiedData saveData = new VerifiedData();
 	private byte[] headerData = new byte[SAVE_HEADER_LENGTH];
+	private ItemData[] inventory;
 
 	private boolean load(ByteBuffer data, int slotIndex) {
 		try {
@@ -138,6 +141,40 @@ public class SaveGame {
 		SaveGame copy = copy();
 		copy.setCharacterName(name);
 		return copy;
+	}
+
+	public ItemData[] inventory() {
+		if (this.inventory !=null) {
+			return this.inventory;
+		}
+		Set<ItemData> list = new TreeSet<>();
+		BytesMatcher finger = new BytesMatcher(new byte[]{106, 0, 0, (byte) 0xB0, 0x01});
+		int offset  = finger.match(saveData.getData(), 0, saveData.length());
+		if (offset >=0) {
+			ByteBuffer data = ByteBuffer.wrap(saveData.getData());
+			offset = offset - 12*1024;
+			if (offset < 0) {offset = 0;}
+			data.position(offset);
+			for (int pointer = 0; pointer<2048; pointer++) {
+				byte[] slice = new byte[12];
+				byte[] id = new byte[2];
+				data.get(slice);
+				id[0] = slice[0];
+				id[1] = slice[1];
+				if (slice[2] == 0 && slice[3] == (byte)0xB0) { // or 0x80, 0x80?
+					Item item = Items.DEFAULT.find(id);
+					if (item !=null) {
+						list.add(new ItemData(item, slice[4], offset, slice));
+					}
+				}
+				offset = offset + 12;
+				if (offset > saveData.length()) {
+					break;
+				}
+			}
+		}
+		this.inventory = list.toArray(new ItemData[0]);
+		return this.inventory;
 	}
 
 }

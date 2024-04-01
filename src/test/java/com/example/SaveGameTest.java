@@ -26,6 +26,16 @@ public class SaveGameTest {
 	}
 
 	@Test
+	public void testInventory() throws Exception {
+		assumeTrue(Paths.get("ER0000.sl2").toFile().exists(), "File does not exist");
+		SaveFile file = SaveFile.from(Paths.get("ER0000.sl2"));
+		SaveGame game = file.getGames()[0];
+		assertThat(game.inventory()).isNotEmpty();
+		assertThat(game.inventory()[0].quantity()).isLessThan(999);
+		assertThat(game.inventory()[0].quantity()).isGreaterThan(0);
+	}
+
+	@Test
 	public void testIdLocations() throws Exception {
 		Path path = Paths.get("ER0000.sl2");
 		assumeTrue(path.toFile().exists(), "File does not exist");

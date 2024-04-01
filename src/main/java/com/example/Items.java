@@ -1,15 +1,29 @@
 package com.example;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
-public class Items {
+public class Items implements Iterable<Item> {
 
     private Map<String, Item> names = new HashMap<>();
-    private Map<byte[], Item> ids = new HashMap<>();
+    private Map<ByteArrayWrapper, Item> ids = new HashMap<>();
+
+    public static Items DEFAULT;
+
+    static {
+        try {
+            DEFAULT = Items.read(Paths.get(Items.class.getClassLoader().getResource("items.csv").toURI()));
+        } catch (URISyntaxException e) {
+            throw new IllegalStateException(e);
+        }
+    }
 
     public static Items read(Path csv) {
         Items items = new Items();
@@ -22,7 +36,7 @@ public class Items {
     }
 
     public Item find(byte[] id) {
-        return ids.get(id);
+        return ids.get(new ByteArrayWrapper(id));
     }
 
     public Item find(String name) {
@@ -33,7 +47,7 @@ public class Items {
         if (item == null || item.name() == null || item.name().length() == 0) {
             return;
         }
-        this.ids.put(item.id(), item);
+        this.ids.put(new ByteArrayWrapper(item.id()), item);
         this.names.put(item.name(), item);
     }
 
@@ -73,5 +87,34 @@ public class Items {
 
     public int count() {
         return ids.size();
+    }
+
+    @Override
+    public Iterator<Item> iterator() {
+        return ids.values().iterator();
+    }
+
+    private static class ByteArrayWrapper {
+        private final byte[] data;
+
+        public ByteArrayWrapper(byte[] data) {
+            if (data == null) {
+                throw new NullPointerException();
+            }
+            this.data = data;
+        }
+
+        @Override
+        public boolean equals(Object other) {
+            if (!(other instanceof ByteArrayWrapper)) {
+                return false;
+            }
+            return Arrays.equals(data, ((ByteArrayWrapper) other).data);
+        }
+
+        @Override
+        public int hashCode() {
+            return Arrays.hashCode(data);
+        }
     }
 }
