@@ -30,9 +30,9 @@ public class SaveGameTest {
 		assumeTrue(Paths.get("ER0000.sl2").toFile().exists(), "File does not exist");
 		SaveFile file = SaveFile.from(Paths.get("ER0000.sl2"));
 		SaveGame game = file.getGames()[0];
-		assertThat(game.inventory()).isNotEmpty();
-		assertThat(game.inventory()[0].quantity()).isLessThan(999);
-		assertThat(game.inventory()[0].quantity()).isGreaterThan(0);
+		assertThat(game.getInventory()).isNotEmpty();
+		assertThat(game.getInventory()[0].quantity()).isLessThan(999);
+		assertThat(game.getInventory()[0].quantity()).isGreaterThan(0);
 	}
 
 	@Test

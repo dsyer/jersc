@@ -143,7 +143,7 @@ public class SaveGame {
 		return copy;
 	}
 
-	public ItemData[] inventory() {
+	public ItemData[] getInventory() {
 		if (this.inventory !=null) {
 			return this.inventory;
 		}
