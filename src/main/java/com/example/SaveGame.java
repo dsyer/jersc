@@ -144,6 +144,33 @@ public class SaveGame {
 		return copy;
 	}
 
+	public SaveGame updateItem(Item item, int quantity) {
+		SaveGame copy = copy();
+		ItemData target = null;
+		for (ItemData data : copy.getInventory()) {
+			if (data.item().equals(item)) {
+				target = data;
+				break;
+			}
+		}
+		if (target == null) {
+			return null;
+		}
+		if (target.quantity() == quantity) {
+			return this;
+		}
+		ByteBuffer bytes = ByteBuffer.wrap(target.data()).order(ByteOrder.LITTLE_ENDIAN);
+		// Update the quantity in the ItemData
+		bytes.putShort(4, (short)quantity);
+		byte[] saved = copy.saveData.getData();
+		// Copy the change in ItemData into the save data
+		saved[target.address() + 4] = target.data()[4];
+		saved[target.address() + 5] = target.data()[5];
+		// Rehash
+		copy.saveData.reverify();
+		return copy;
+	}
+
 	public ItemData[] getInventory() {
 		if (this.inventory !=null) {
 			return this.inventory;

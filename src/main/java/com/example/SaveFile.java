@@ -85,6 +85,10 @@ public class SaveFile {
 		return this;
 	}
 
+	public SaveFile updateSlot(SaveGame game) {
+		return replaceSlot(game.getIndex(), game);
+	}
+
 	public SaveFile replaceSlot(int slot, SaveGame game) {
 		if (slot < 0 || slot >= 10) {
 			throw new IllegalArgumentException("Invalid slot: " + slot);
