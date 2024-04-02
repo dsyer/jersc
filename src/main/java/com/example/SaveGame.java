@@ -4,8 +4,10 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.HexFormat;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.IntStream;
 
 public class SaveGame {
 
@@ -159,31 +161,37 @@ public class SaveGame {
 		if (target.quantity() == quantity) {
 			return this;
 		}
-		ByteBuffer bytes = ByteBuffer.wrap(target.data()).order(ByteOrder.LITTLE_ENDIAN);
+		if (quantity > 999) {
+			// They might overflow into the stored slot? Not sure. Also what about tools (limit 99) 
+			// or key items (limit 1)?
+			quantity = 999;
+		}
 		// Update the quantity in the ItemData
-		bytes.putShort(4, (short)quantity);
+		target.data()[4] = (byte) quantity;
 		byte[] saved = copy.saveData.getData();
 		// Copy the change in ItemData into the save data
 		saved[target.address() + 4] = target.data()[4];
-		saved[target.address() + 5] = target.data()[5];
 		// Rehash
 		copy.saveData.reverify();
 		return copy;
 	}
 
 	public ItemData[] getInventory() {
-		if (this.inventory !=null) {
+		if (this.inventory != null) {
 			return this.inventory;
 		}
+		boolean debug = !Environment.get("debug", "false").equals("false");
 		Set<ItemData> list = new TreeSet<>();
-		BytesMatcher finger = new BytesMatcher(new byte[]{106, 0, 0, (byte) 0xB0, 0x01});
+		BytesMatcher finger = new BytesMatcher(new byte[] { 106, 0, 0, (byte) 0xB0, 0x01 });
 		// There's always a Tarnished Wizened Finger [106, 0]
 		// but it's not always in the same place, so find it...
-		int offset  = finger.match(saveData.getData(), 0, saveData.length());
-		if (offset >=0) {
+		int offset = finger.match(saveData.getData(), 0, saveData.length());
+		if (offset >= 0) {
 			ByteBuffer data = ByteBuffer.wrap(saveData.getData());
-			offset = offset - 12*1024; // each item occupies 12 bytes
-			if (offset < 0) {offset = 0;}
+			offset = offset - 12 * 1024; // each item occupies 12 bytes
+			if (offset < 0) {
+				offset = 0;
+			}
 			// ... and then start scanning for other known items
 			data.position(offset);
 			// Check a maximum of 2048 potential items.
@@ -193,12 +201,18 @@ public class SaveGame {
 				data.get(slice);
 				id[0] = slice[0];
 				id[1] = slice[1];
-				if (slice[2] == 0 && slice[3] == (byte)0xB0) { // or 0x80, 0x80?
+				if (slice[2] == 0 && slice[3] == (byte) 0xB0) { // or 0x80, 0x80?
 					Item item = Items.DEFAULT.find(id);
-					if (item !=null) {
+					ByteBuffer wrapper = ByteBuffer.wrap(slice).order(ByteOrder.LITTLE_ENDIAN);
+					if (item != null) {
 						// We found a known item, so extract the quantity
-						ByteBuffer wrapper = ByteBuffer.wrap(slice).order(ByteOrder.LITTLE_ENDIAN);
-						list.add(new ItemData(item, wrapper.getShort(4), offset, slice));
+						list.add(new ItemData(item, wrapper.getShort(4), data.position() - slice.length, slice));
+						if (debug) {
+							System.err.println((data.position() - slice.length) + " " + item + ": " + wrapper.getShort(4) + ", " + Arrays.toString(slice));
+						}
+					} else if (debug) {
+						System.err.println((data.position() - slice.length) + " ? " + Arrays.toString(id) + ": " + wrapper.getShort(4) + ", "
+								+ Arrays.toString(slice));
 					}
 				}
 				// Move to the next item potential location
