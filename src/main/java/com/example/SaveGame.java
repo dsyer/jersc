@@ -4,10 +4,8 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.HexFormat;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.stream.IntStream;
 
 public class SaveGame {
 
@@ -124,7 +122,8 @@ public class SaveGame {
 		StringBuilder builder = new StringBuilder();
 		builder.append("Slot=").append(index).append(": ").append(characterName).append("=");
 		builder.append("[Level=").append(characterLevel).append(",");
-		builder.append("Played=").append(secondsPlayed).append("s]");
+		builder.append("Played=").append(secondsPlayed).append("s,");
+		builder.append("Valid=").append(saveData.isVerified()).append("]");
 		return builder.toString();
 	}
 
@@ -147,9 +146,8 @@ public class SaveGame {
 	}
 
 	public SaveGame updateItem(Item item, int quantity) {
-		SaveGame copy = copy();
 		ItemData target = null;
-		for (ItemData data : copy.getInventory()) {
+		for (ItemData data : getInventory()) {
 			if (data.item().equals(item)) {
 				target = data;
 				break;
@@ -167,10 +165,10 @@ public class SaveGame {
 			quantity = 999;
 		}
 		// Update the quantity in the ItemData
-		target.data()[4] = (byte) quantity;
+		SaveGame copy = copy();
 		byte[] saved = copy.saveData.getData();
 		// Copy the change in ItemData into the save data
-		saved[target.address() + 4] = target.data()[4];
+		ByteBuffer.wrap(saved).order(ByteOrder.LITTLE_ENDIAN).putShort(target.address() + 4, (short)quantity);
 		// Rehash
 		copy.saveData.reverify();
 		return copy;

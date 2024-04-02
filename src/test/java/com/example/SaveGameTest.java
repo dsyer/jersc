@@ -9,7 +9,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 
 import org.junit.jupiter.api.Test;
 
@@ -31,6 +30,7 @@ public class SaveGameTest {
 		// System.setProperty("debug", "true");
 		assumeTrue(Paths.get("ER0000.sl2").toFile().exists(), "File does not exist");
 		SaveFile file = SaveFile.from(Paths.get("ER0000.sl2"));
+		// System.err.println(file.prettyPrint());
 		SaveGame game = file.getGames()[1];
 		assertThat(game.getInventory()).hasSizeGreaterThan(1);
 		int offset = 0;
@@ -48,12 +48,13 @@ public class SaveGameTest {
 		SaveFile file = SaveFile.from(Paths.get("ER0000.sl2"));
 		SaveGame game = file.getGames()[0];
 		assertThat(game.getInventory()).hasSizeGreaterThan(1);
-		ItemData data = game.getInventory()[0];
+		ItemData data = game.getInventory()[1];
 		SaveGame updated = game.updateItem(data.item(), data.quantity());
 		assertThat(updated).isEqualTo(game);
 		updated = game.updateItem(data.item(), data.quantity() + 1);
 		assertThat(updated).isNotEqualTo(game);
 		assertThat(updated.getSaveData().isVerified()).isTrue();
+		assertThat(updated.getInventory()[1].quantity()).isEqualTo(data.quantity() + 1);
 	}
 
 	@Test

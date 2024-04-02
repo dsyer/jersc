@@ -104,6 +104,7 @@ public class SaveFile {
 		// Copy data to buffer
 		this.data.put(existing.getSaveDataOffset(), game.getSaveData().getData());
 		// Including hash
+		game.getSaveData().reverify();
 		this.data.put(existing.getSaveDataOffset() - 16, game.getSaveData().getHash());
 		// Copy header data
 		this.data.put(existing.getHeaderDataOffset(), game.getHeaderData());
