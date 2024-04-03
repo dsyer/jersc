@@ -95,6 +95,10 @@ public class DemoApplication {
 		if (!name.equals(game.getCharacterName())) {
 			game = game.named(name);
 		}
+		if (confirm("Do you want to inspect the status")) {
+			StatusData status = game.getStatus();
+			System.out.println(status.prettyPrint());
+		}
 		if (confirm("Do you want to inspect the inventory")) {
 			for (ItemData data : game.getInventory()) {
 				String key = data.item().name();

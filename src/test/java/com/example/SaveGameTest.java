@@ -9,6 +9,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 
 import org.junit.jupiter.api.Test;
 
@@ -55,6 +56,17 @@ public class SaveGameTest {
 		assertThat(updated).isNotEqualTo(game);
 		assertThat(updated.getSaveData().isVerified()).isTrue();
 		assertThat(updated.getInventory()[1].quantity()).isEqualTo(data.quantity() + 1);
+	}
+
+	@Test
+	public void testStatus() throws Exception {
+		assumeTrue(Paths.get("ER0000.sl2").toFile().exists(), "File does not exist");
+		SaveFile file = SaveFile.from(Paths.get("ER0000.sl2"));
+		SaveGame game = file.getGames()[0];
+		assertThat(game.getStatus().status().level()).isEqualTo(game.getCharacterLevel());
+		assertThat(game.getStatus().status().hp()).isEqualTo(game.getStatus().data().getShort(game.getStatus().address() - 36));
+		assertThat(game.getStatus().status().fp()).isEqualTo(game.getStatus().data().getShort(game.getStatus().address() - 24));
+		assertThat(game.getStatus().status().st()).isEqualTo(game.getStatus().data().getShort(game.getStatus().address() - 8));
 	}
 
 	@Test

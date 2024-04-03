@@ -27,6 +27,7 @@ public class SaveGame {
 	private VerifiedData saveData = new VerifiedData();
 	private byte[] headerData = new byte[SAVE_HEADER_LENGTH];
 	private ItemData[] inventory;
+	private StatusData status;
 
 	private boolean load(ByteBuffer data, int slotIndex) {
 		try {
@@ -175,6 +176,20 @@ public class SaveGame {
 		// Rehash
 		copy.saveData.reverify();
 		return copy;
+	}
+
+	public StatusData getStatus() {
+		if (this.status == null) {
+			ByteBuffer data = ByteBuffer.wrap(saveData.getData()).order(ByteOrder.LITTLE_ENDIAN);
+			for (int offset = 0; offset < saveData.getData().length - 48; offset++) {
+				StatusData status = StatusData.from(data, offset);
+				if (status != null && status.status().level() == characterLevel) {
+					this.status = status;
+					break;
+				}
+			}
+		}
+		return this.status;
 	}
 
 	public ItemData[] getInventory() {
