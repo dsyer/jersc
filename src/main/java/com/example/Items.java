@@ -1,6 +1,9 @@
 package com.example;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -18,9 +21,9 @@ public class Items implements Iterable<Item> {
     public static Items DEFAULT;
 
     static {
-        try {
-            DEFAULT = Items.read(Paths.get(Items.class.getClassLoader().getResource("items.csv").toURI()));
-        } catch (URISyntaxException e) {
+        try (InputStream csv = Items.class.getClassLoader().getResourceAsStream("items.csv")) {
+            DEFAULT = Items.read(csv);
+        } catch (IOException e) {
             throw new IllegalStateException(e);
         }
     }
@@ -29,6 +32,26 @@ public class Items implements Iterable<Item> {
         Items items = new Items();
         try {
             Files.lines(csv).skip(1).map(Items::parse).forEach(item -> items.add(item));
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+        return items;
+    }
+
+    public static Items read(InputStream csv) {
+        Items items = new Items();
+        try {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(csv));
+            String line = reader.readLine();
+            if (line != null) {
+                // skip header
+                line = reader.readLine();
+            }
+            while (line != null) {
+                Item item = Items.parse(line);
+                items.add(item);
+                line = reader.readLine();
+            }
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
@@ -56,7 +79,8 @@ public class Items implements Iterable<Item> {
             return null;
         }
         String data[] = columns(csv);
-        Item result = new Item(data[0], new byte[] { (byte) Integer.parseInt(data[1]), (byte) Integer.parseInt(data[2]) });
+        Item result = new Item(data[0],
+                new byte[] { (byte) Integer.parseInt(data[1]), (byte) Integer.parseInt(data[2]) });
         return result;
     }
 
