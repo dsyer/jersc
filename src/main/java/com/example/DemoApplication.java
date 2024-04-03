@@ -34,6 +34,27 @@ public class DemoApplication {
 		return fallback;
 	}
 
+	private String[] lines(String message) {
+		System.out.println(message + " (empty line to end input):");
+		List<String> lines = new ArrayList<>();
+		String line = scanner.nextLine();
+		while (!line.isEmpty()) {
+			lines.add(line);
+			line = scanner.nextLine();
+		}
+		return lines.toArray(new String[0]);
+	}
+
+	private int select(String message, List<Integer> options) {
+		System.out.print(message + " " + options + "? ");
+		int result = options.get(0);
+		String line = scanner.nextLine();
+		if (!line.isEmpty()) {
+			result = Integer.parseInt(line);
+		}
+		return result;
+	}
+
 	private void run() {
 		input = new File(accept("Input file", input.getPath()));
 		if (!input.exists()) {
@@ -57,33 +78,58 @@ public class DemoApplication {
 			result = save.copy();
 		}
 		save.changeId(result.getId());
-		List<Integer> activeSlots = activeSlots(save);
-		System.out.print("Which slot do you want to copy from " + activeSlots + "? ");
-		String line = scanner.nextLine();
-		int slot = activeSlots.isEmpty() ? 0 : activeSlots.get(0);
-		if (!line.isEmpty()) {
-			slot = Integer.parseInt(line);
-			if (slot < 0 || slot >= save.getGames().length || !save.getGames()[slot].isActive()) {
-				System.out.println("Invalid slot " + slot);
-				return;
-			}
+		int slot = select("Which slot do you want to copy from", activeSlots(save));
+		if (slot < 0 || slot >= save.getGames().length || !save.getGames()[slot].isActive()) {
+			System.out.println("Invalid slot " + slot);
+			return;
 		}
-		System.out.println("Writing to:");
+		System.out.println("Writing " + save.getGames()[slot].getCharacterName() + " to:");
 		System.out.println(result.prettyPrint());
-		System.out.print("Which slot do you want to copy to " + slots(result) + "? ");
-		line = scanner.nextLine();
-		int target = 0;
-		if (!line.isEmpty()) {
-			target = Integer.parseInt(line);
-			if (target < 0 || target >= result.getGames().length) {
-				System.out.println("Invalid slot " + target);
-				return;
-			}
+		int target = select("Which slot do you want to copy to", slots(result));
+		if (target < 0 || target >= result.getGames().length) {
+			System.out.println("Invalid slot " + target);
+			return;
 		}
 		SaveGame game = save.getGames()[slot];
 		String name = accept("New name for character", game.getCharacterName());
 		if (!name.equals(game.getCharacterName())) {
 			game = game.named(name);
+		}
+		if (confirm("Do you want to inspect the inventory")) {
+			for (ItemData data : game.getInventory()) {
+				String key = data.item().name();
+				if (key.contains(",") && !key.startsWith("\"")) {
+					key = "\"" + key + "\"";
+				}
+				System.out.println(key + ", " + data.quantity());
+			}
+			if (confirm("Do you want to update the inventory")) {
+
+				String[] updates = lines("Enter inventory updates as name, quantity");
+				for (String line : updates) {
+					if (!line.contains(",")) {
+						continue;
+					}
+					try {
+						String key = line.substring(0, line.lastIndexOf(",")).trim();
+						String raw = key;
+						if (key.startsWith("\"")) {
+							key = key.substring(1);
+							key = key.substring(0, key.length() - 1);
+						}
+						int value = Integer.parseInt(line.substring(line.lastIndexOf(",") + 1).trim());
+						Item item = Items.DEFAULT.find(key);
+						if (item != null) {
+							game = game.updateItem(item, value);
+							System.out.println("Updated: " + raw + ", " + value);
+						} else {
+							System.out.println("Unknown item: " + raw);
+						}
+					} catch (Exception e) {
+						System.out.println("Error: " + line);
+					}
+				}
+			}
 		}
 		result.replaceSlot(target, game);
 		System.out.println(result.prettyPrint());

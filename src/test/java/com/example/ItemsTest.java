@@ -18,6 +18,15 @@ public class ItemsTest {
     }
     
     @Test
+    public void testEmbeddedCommas() {
+        Items items = Items.read(Paths.get("src/test/resources/few.csv"));
+        assertThat(items).isNotNull();
+        Item item = items.find("O, Flame!");
+        assertThat(item).isNotNull();
+        assertThat(items.find(item.id())).isEqualTo(item);
+    }
+    
+    @Test
     public void testReadResource() throws Exception {
         Items items = Items.DEFAULT;
         assertThat(items).isNotNull();

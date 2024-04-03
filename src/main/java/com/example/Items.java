@@ -56,8 +56,7 @@ public class Items implements Iterable<Item> {
             return null;
         }
         String data[] = columns(csv);
-        Item result = new Item(data[0].trim(),
-                new byte[] { (byte) Integer.parseInt(data[1].trim()), (byte) Integer.parseInt(data[2].trim()) });
+        Item result = new Item(data[0], new byte[] { (byte) Integer.parseInt(data[1]), (byte) Integer.parseInt(data[2]) });
         return result;
     }
 

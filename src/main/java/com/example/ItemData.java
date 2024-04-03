@@ -4,7 +4,7 @@ public record ItemData(Item item, int quantity, int address, byte[] data) implem
 
     @Override
     public int compareTo(ItemData other) {
-        return other.item().name().compareTo(item().name());
+        return item().name().compareTo(other.item().name());
     }
 
     @Override
