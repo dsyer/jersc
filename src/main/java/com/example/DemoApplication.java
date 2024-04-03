@@ -14,51 +14,52 @@ public class DemoApplication {
 
 	private Scanner scanner = new Scanner(System.in);
 
-	private void run() {
-		System.out.print("Input file (" + input + ")? ");
+	private boolean confirm(String message) {
+		System.out.print(message + " (Y/n)? ");
 		String line = scanner.nextLine();
 		if (!line.isEmpty()) {
-			input = new File(line);
+			if (line.toLowerCase().charAt(0) == 'n') {
+				return false;
+			}
 		}
+		return true;
+	}
+
+	private String accept(String message, String fallback) {
+		System.out.print(message + " (" + fallback + ")? ");
+		String line = scanner.nextLine();
+		if (!line.isEmpty()) {
+			return line;
+		}
+		return fallback;
+	}
+
+	private void run() {
+		input = new File(accept("Input file", input.getPath()));
 		if (!input.exists()) {
 			System.out.println("File " + input + " does not exist.");
 			return;
 		}
 		SaveFile save = SaveFile.from(input.toPath());
 		System.out.println(save.prettyPrint());
-		System.out.print("Do you want to copy a game from the file (Y/n)? ");
-		line = scanner.nextLine();
-		if (!line.isEmpty()) {
-			if (line.toLowerCase().charAt(0) == 'n') {
+		if (!confirm("Do you want to copy a game from the file")) {
+			return;
+		}
+		output = new File(accept("Output file", output.getPath()));
+		SaveFile result = null;
+		if (output.exists()) {
+			if (!confirm("File " + output + " already exists.\nDo you want to overwrite this file")) {
 				return;
 			}
-		}
-		System.out.print("Output file (" + output + ")? ");
-		line = scanner.nextLine();
-		if (!line.isEmpty()) {
-			output = new File(line);
-		}
-		SaveFile result;
-		if (output.exists()) {
-			System.out.println("File " + output + " already exists.");
-			System.out.print("Do you want to overwrite this file (Y/n)? ");
-			line = scanner.nextLine();
-			if (!line.isEmpty()) {
-				if (line.toLowerCase().charAt(0) == 'n') {
-					return;
-				}
-			}
 			result = SaveFile.from(output.toPath());
-			if (result == null) {
-				result = save.copy();
-			}
-		} else {
+		}
+		if (result == null) {
 			result = save.copy();
 		}
 		save.changeId(result.getId());
 		List<Integer> activeSlots = activeSlots(save);
 		System.out.print("Which slot do you want to copy from " + activeSlots + "? ");
-		line = scanner.nextLine();
+		String line = scanner.nextLine();
 		int slot = activeSlots.isEmpty() ? 0 : activeSlots.get(0);
 		if (!line.isEmpty()) {
 			slot = Integer.parseInt(line);
@@ -80,19 +81,14 @@ public class DemoApplication {
 			}
 		}
 		SaveGame game = save.getGames()[slot];
-		System.out.print("New name for character (" + game.getCharacterName() + ")? ");
-		line = scanner.nextLine();
-		if (!line.isEmpty()) {
-			game = game.named(line);
+		String name = accept("New name for character", game.getCharacterName());
+		if (!name.equals(game.getCharacterName())) {
+			game = game.named(name);
 		}
 		result.replaceSlot(target, game);
 		System.out.println(result.prettyPrint());
-		System.out.print("Continue (Y/n)? ");
-		line = scanner.nextLine();
-		if (!line.isEmpty()) {
-			if (line.toLowerCase().charAt(0) == 'n') {
-				return;
-			}
+		if (!confirm("Continue")) {
+			return;
 		}
 		result.save(output.toPath());
 		System.out.println("Saved " + output);

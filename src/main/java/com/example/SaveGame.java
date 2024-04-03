@@ -103,6 +103,9 @@ public class SaveGame {
 	}
 
 	public void setCharacterName(String characterName) {
+		if (characterName.equals(this.characterName)) {
+			return;
+		}
 		this.characterName = characterName.trim();
 		byte[] name = characterName.getBytes(StandardCharsets.UTF_16LE);
 		while (name.length > CHAR_NAME_LENGTH) {
@@ -121,9 +124,9 @@ public class SaveGame {
 	public String prettyPrint() {
 		StringBuilder builder = new StringBuilder();
 		builder.append("Slot=").append(index).append(": ").append(characterName).append("=");
-		builder.append("[Level=").append(characterLevel).append(",");
-		builder.append("Played=").append(secondsPlayed).append("s,");
-		builder.append("Valid=").append(saveData.isVerified()).append("]");
+		builder.append("[level=").append(characterLevel).append(", ");
+		builder.append("played=").append(secondsPlayed).append("s, ");
+		builder.append("valid=").append(saveData.isVerified()).append("]");
 		return builder.toString();
 	}
 
