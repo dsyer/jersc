@@ -39,6 +39,8 @@ SaveFile: [id=76561197960267366, valid=true]
 Slot=0: Foo=[Level=99,Played=1534s]
 Which slot do you want to copy to [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]? 1
 New name for character (777)? Bar
+Do you want to inspect the status (Y/n)? n
+Do you want to inspect the inventory (Y/n)? n
 SaveFile: [id=76561197960267366, valid=true]
 Slot=0: Foo=[Level=99,Played=1534s]
 Slot=1: Bar=[Level=99,Played=1534s]
@@ -63,6 +65,8 @@ Slot=1: RedFish=[Level=138,Played=165214s]
 Slot=2: LittleFish=[Level=184,Played=573239s]
 Which slot do you want to copy to [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]? 3
 New name for character (Foo)? Bar
+Do you want to inspect the status (Y/n)? n
+Do you want to inspect the inventory (Y/n)? n
 SaveFile: [id=76561199114987181, valid=true]
 Slot=0: BigFish=[Level=197,Played=646829s]
 Slot=1: RedFish=[Level=138,Played=165214s]
@@ -70,3 +74,46 @@ Slot=2: LittleFish=[Level=184,Played=573239s]
 Slot=3: Bar=[Level=99,Played=1534s]
 Continue (Y/n)? 
 ```
+
+If you answer "Y" to the prompt to inspect the status, you will see the character's stats and progress. You can respec the character by entering `key=value` pairs for the stats you want to change (comma-separated). The key names are `VIG` (vigor[_sic_]), `MND` (mind), `END` (endurance), `STR` (strength), `DEX` (dexterity), `INT` (intelligence), `FAI` (faith) and `ARC` (arcane). Example:
+
+```bash
+...
+Do you want to inspect the status (Y/n)?
+Do you want to inspect the status (Y/n)? 
+Status[VIG=50, MND=40, END=30, STR=40, DEX=40, INT=80, FTH=40, ARC=30], level=271
+Enter updates as name=quantity,name=quantity (or empty to skip) ()? STR=50,DEX=50
+Respec to: Status[VIG=50, MND=40, END=30, STR=50, DEX=50, INT=80, FTH=40, ARC=30] (Y/n)?
+...
+```
+
+If you answer "Y" to the prompt to inspect the inventory, you will see the character's inventory listed in CSV format: `name, quantity`. The name will be quoted if it has a comma in it (e.g. "O, Flame!"). You can add or remove items from the inventory by entering `name, quantity` pairs (line-separated) in the same format. Example:
+
+```bash
+...
+Do you want to inspect the inventory (Y/n)? 
+Champion Headband, 1
+Erdleaf Flower, 1
+Finger Severer, 1
+Flask of Cerulean Tears, 1
+Flask of Crimson Tears, 3
+Golden Rune :[1], 2
+Memory of Grace, 1
+Mushroom, 2
+Root Resin, 3
+Rowa Fruit, 10
+Small Golden Effigy, 1
+Smithing Stone :[1], 1
+Spectral Steed Whistle, 1
+Tarnished Wizened Finger, 1
+Tarnisheds Furled Finger, 1
+Throwing Dagger, 40
+Do you want to update the inventory (Y/n)? 
+Enter inventory updates as name, quantity (empty line to end input):
+Rowa Fruit, 100
+
+Updated: Rowa Fruit, 100
+...
+```
+
+The name of the item has to match the printed output and you can't add items that are not already in your inventory (any line of input that doesn't match an existing item will be ignored). Also be careful how large the quantity is because the game has different limits for different items and the app doesn't know how to enforce them. Crafting items are generally limited to 999, tools mostly 99, but with quite a few expceptions. Key items are usually limited to 1 as are re-usable tools (e.g. Tarnished Wizened Finger). Check in the game to see what the limits are for the items you want to add.
