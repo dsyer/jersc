@@ -180,7 +180,7 @@ public class SaveGame {
 		return copy;
 	}
 
-	public StatusData getStatus() {
+	public Status getStatus() {
 		if (this.status == null) {
 			ByteBuffer data = ByteBuffer.wrap(saveData.getData()).order(ByteOrder.LITTLE_ENDIAN);
 			for (int offset = 0; offset < saveData.getData().length - 48; offset++) {
@@ -191,7 +191,7 @@ public class SaveGame {
 				}
 			}
 		}
-		return this.status;
+		return this.status == null ? null : this.status.status();
 	}
 
 	public ItemData[] getInventory() {
@@ -244,16 +244,55 @@ public class SaveGame {
 	}
 
 	public SaveGame respec(Status status) {
-		if (status == null || (getStatus()!=null && status.equals(getStatus().status()) && status.level() == characterLevel)) {
+		if (status == null || (getStatus()!=null && status.equals(this.status.status()) && status.level() == characterLevel)) {
 			// Nothing to do
 			return this;
 		}
 		SaveGame copy = copy();
-		copy.getStatus().respec(status);
+		copy.getStatus(); // Ensure the status is loaded
+		if (copy.getStatus() == null) {
+			return this;
+		}
+		copy.status.respec(status);
 		copy.characterLevel = status.level();
 		ByteBuffer data = ByteBuffer.wrap(copy.headerData).order(ByteOrder.LITTLE_ENDIAN);
 		data.putInt(CHAR_LEVEL_LOCATION, status.level());
 		return copy;
 	}
 
+	static record StatusData(Status status, ByteBuffer data, int address) {
+
+		public static StatusData from(ByteBuffer data, int address) {
+			Status status = Status.from(data.slice(address, 48).order(ByteOrder.LITTLE_ENDIAN));
+			if (status == null) {
+				return null;
+			}
+			return new StatusData(status, data, address);
+		}
+	
+		public StatusData respec(Status status) {
+			data.putShort(address + 0, (short)status.VIG());
+			data.putShort(address + 4, (short)status.MND());
+			data.putShort(address + 8, (short)status.END());
+			data.putShort(address + 12, (short)status.STR());
+			data.putShort(address + 16, (short)status.DEX());
+			data.putShort(address + 20, (short)status.INT());
+			data.putShort(address + 24, (short)status.FTH());
+			data.putShort(address + 28, (short)status.ARC());
+			data.putShort(address + 44, (short)status.level());
+			updateStats(-8, status.st());
+			updateStats(-24, status.fp());
+			updateStats(-36, status.hp());
+			return new StatusData(status, data, address);
+		}
+	
+		private void updateStats(int offset, int level) {
+			// This is the base stat.
+			data.putShort(address + offset, (short)level);
+			// We have to assume the other two are going to be adjusted by the game.
+			data.putShort(address + offset - 4, (short)level);
+			data.putShort(address + offset - 8, (short)level);
+		}
+		
+	}
 }

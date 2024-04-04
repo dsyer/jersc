@@ -48,13 +48,14 @@ public class SaveFileTest {
 		int slot = file.findInactive();
 		file.replaceSlot(slot, game);
 		assertThat(file.validate()).isTrue();
-		System.err.println(file.prettyPrint());
+		// System.err.println(file.prettyPrint());
 		assertThat(file.getGames()[0].getIndex()).isEqualTo(0);
 		SaveGame saved = file.getGames()[slot];
-		System.err.println(saved.getStatus().prettyPrint());
+		// System.err.println(saved.getStatus().prettyPrint());
 		assertThat(saved.isActive()).isTrue();
 		assertThat(saved.getIndex()).isEqualTo(slot);
 		assertThat(file.validate()).isTrue();
+		assertThat(saved.getStatus().STR()).isEqualTo(99);
 	}
 
 }

@@ -9,9 +9,11 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.test.util.ReflectionTestUtils;
+
+import com.example.SaveGame.StatusData;
 
 public class SaveGameTest {
 
@@ -67,10 +69,11 @@ public class SaveGameTest {
 		assumeTrue(Paths.get("ER0000.sl2").toFile().exists(), "File does not exist");
 		SaveFile file = SaveFile.from(Paths.get("ER0000.sl2"));
 		SaveGame game = file.getGames()[0];
-		assertThat(game.getStatus().status().level()).isEqualTo(game.getCharacterLevel());
-		assertThat(game.getStatus().status().hp()).isEqualTo(game.getStatus().data().getShort(game.getStatus().address() - 36));
-		assertThat(game.getStatus().status().fp()).isEqualTo(game.getStatus().data().getShort(game.getStatus().address() - 24));
-		assertThat(game.getStatus().status().st()).isEqualTo(game.getStatus().data().getShort(game.getStatus().address() - 8));
+		assertThat(game.getStatus().level()).isEqualTo(game.getCharacterLevel());
+		StatusData data = (StatusData) ReflectionTestUtils.getField(game, "status");
+		assertThat(game.getStatus().hp()).isEqualTo(data.data().getShort(data.address() - 36));
+		assertThat(game.getStatus().fp()).isEqualTo(data.data().getShort(data.address() - 24));
+		assertThat(game.getStatus().st()).isEqualTo(data.data().getShort(data.address() - 8));
 	}
 
 	@Test

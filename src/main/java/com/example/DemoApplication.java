@@ -94,14 +94,14 @@ public class DemoApplication {
 		String name = accept("New name for character", game.getCharacterName());
 		game = game.named(name);
 		if (confirm("Do you want to inspect the status")) {
-			StatusData status = game.getStatus();
+			Status status = game.getStatus();
 			System.out.println(status.prettyPrint());
 
 			String line = accept(
 					"Enter updates as name=quantity,name=quantity (or empty to skip)", "");
 			if (line.contains("=")) {
 				String[] updates = line.split(",");
-				Status updated = status.status();
+				Status updated = status;
 				for (String update : updates) {
 					String[] parts = update.split("=");
 					if (parts.length == 2) {
@@ -114,7 +114,7 @@ public class DemoApplication {
 						}
 					}
 				}
-				if (!status.status().equals(updated)) {
+				if (!status.equals(updated)) {
 					if (confirm("Respec to: " + updated)) {
 						game = game.respec(updated);
 					}
