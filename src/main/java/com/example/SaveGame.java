@@ -107,6 +107,7 @@ public class SaveGame {
 		if (characterName.equals(this.characterName)) {
 			return;
 		}
+		String oldName = this.characterName;
 		this.characterName = characterName.trim();
 		byte[] name = characterName.getBytes(StandardCharsets.UTF_16LE);
 		while (name.length > CHAR_NAME_LENGTH) {
@@ -115,6 +116,10 @@ public class SaveGame {
 		byte[] data = new byte[CHAR_NAME_LENGTH];
 		System.arraycopy(name, 0, data, 0, name.length);
 		System.arraycopy(data, 0, headerData, 0, data.length);
+		for (int i : new BytesMatcher(oldName.getBytes(StandardCharsets.UTF_16LE)).matches(saveData.getData())) {
+			// Some games get the character name stashed in the save data too
+			ByteBuffer.wrap(saveData.getData()).order(ByteOrder.LITTLE_ENDIAN).put(i, data);
+		}
 		saveData.reverify();
 	}
 
@@ -239,6 +244,19 @@ public class SaveGame {
 		}
 		this.inventory = list.toArray(new ItemData[0]);
 		return this.inventory;
+	}
+
+	public SaveGame respec(Status status) {
+		if (status == null || (getStatus()!=null && status.equals(getStatus().status()) && status.level() == characterLevel)) {
+			// Nothing to do
+			return this;
+		}
+		SaveGame copy = copy();
+		copy.getStatus().respec(status);
+		copy.characterLevel = status.level();
+		ByteBuffer data = ByteBuffer.wrap(copy.headerData).order(ByteOrder.LITTLE_ENDIAN);
+		data.putInt(CHAR_LEVEL_LOCATION, status.level());
+		return copy;
 	}
 
 }

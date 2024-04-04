@@ -38,7 +38,7 @@ public record StatusData(Status status, ByteBuffer data, int address) {
 	}
 
 	public String prettyPrint() {
-		return status.toString() + ", level=" + status.level();
+		return status.prettyPrint();
 	}
 	
 }

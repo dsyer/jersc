@@ -40,4 +40,31 @@ public record Status(int VIG, int MND, int END, int STR, int DEX, int INT, int F
 		return Progression.st(END);
 	}
 
+	public Status with(StatusType type, int value) {
+		switch (type) {
+			case VIG:
+				return new Status(value, MND, END, STR, DEX, INT, FTH, ARC);
+			case MND:
+				return new Status(VIG, value, END, STR, DEX, INT, FTH, ARC);
+			case END:
+				return new Status(VIG, MND, value, STR, DEX, INT, FTH, ARC);
+			case STR:
+				return new Status(VIG, MND, END, value, DEX, INT, FTH, ARC);
+			case DEX:
+				return new Status(VIG, MND, END, STR, value, INT, FTH, ARC);
+			case INT:
+				return new Status(VIG, MND, END, STR, DEX, value, FTH, ARC);
+			case FTH:
+				return new Status(VIG, MND, END, STR, DEX, INT, value, ARC);
+			case ARC:
+				return new Status(VIG, MND, END, STR, DEX, INT, FTH, value);
+			default:
+				return this;
+		}
+	}
+
+	public String prettyPrint() {
+		return toString() + ", level=" + level();
+	}
+
 }

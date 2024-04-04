@@ -92,12 +92,34 @@ public class DemoApplication {
 		}
 		SaveGame game = save.getGames()[slot];
 		String name = accept("New name for character", game.getCharacterName());
-		if (!name.equals(game.getCharacterName())) {
-			game = game.named(name);
-		}
+		game = game.named(name);
 		if (confirm("Do you want to inspect the status")) {
 			StatusData status = game.getStatus();
 			System.out.println(status.prettyPrint());
+
+			String line = accept(
+					"Enter updates as name=quantity,name=quantity (or empty to skip)", "");
+			if (line.contains("=")) {
+				String[] updates = line.split(",");
+				Status updated = status.status();
+				for (String update : updates) {
+					String[] parts = update.split("=");
+					if (parts.length == 2) {
+						try {
+							String key = parts[0].trim();
+							int value = Integer.parseInt(parts[1].trim());
+							StatusType type = StatusType.valueOf(key.toUpperCase());
+							updated = updated.with(type, value);
+						} catch (Exception e) {
+						}
+					}
+				}
+				if (!status.status().equals(updated)) {
+					if (confirm("Respec to: " + updated)) {
+						game = game.respec(updated);
+					}
+				}
+			}
 		}
 		if (confirm("Do you want to inspect the inventory")) {
 			for (ItemData data : game.getInventory()) {
