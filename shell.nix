@@ -3,6 +3,7 @@ mkShell {
   buildInputs = [
     zlib.static
     gcc
+    jbang
    ];
 }
 
