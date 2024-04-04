@@ -103,10 +103,7 @@ public class SaveGame {
 		return saveData.length() + headerData.length;
 	}
 
-	public void setCharacterName(String characterName) {
-		if (characterName.equals(this.characterName)) {
-			return;
-		}
+	private void setCharacterName(String characterName) {
 		String oldName = this.characterName;
 		this.characterName = characterName.trim();
 		byte[] name = characterName.getBytes(StandardCharsets.UTF_16LE);
