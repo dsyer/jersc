@@ -31,8 +31,12 @@ public class SaveGameTest {
 		// System.setProperty("debug", "true");
 		assumeTrue(Paths.get("ER0000.sl2").toFile().exists(), "File does not exist");
 		SaveFile file = SaveFile.from(Paths.get("ER0000.sl2"));
+		int index = 1;
+		if (file.getGames().length < 2) {
+			index = 0;
+		}
 		// System.err.println(file.prettyPrint());
-		SaveGame game = file.getGames()[1];
+		SaveGame game = file.getGames()[index];
 		assertThat(game.getInventory()).hasSizeGreaterThan(1);
 		int offset = 0;
 		for (ItemData data : game.getInventory()) {
