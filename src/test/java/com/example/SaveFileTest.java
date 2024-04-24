@@ -11,11 +11,40 @@ import org.junit.jupiter.api.Test;
 public class SaveFileTest {
 
 	@Test
-	public void testFileLength() throws Exception {
+	public void testCompress() throws Exception {
 		assumeTrue(Paths.get("ER0000.sl2").toFile().exists(), "File does not exist");
 		SaveFile file = SaveFile.from(Paths.get("ER0000.sl2"));
 		assertThat(file.validate()).isTrue();
+		if (!Paths.get("ER0000.sl2.gz").toFile().exists()) {
+			file.save(Paths.get("ER0000.sl2.gz"));
+			file = SaveFile.from(Paths.get("ER0000.sl2.gz"));
+			assertThat(file.validate()).isTrue();
+		}
 		// System.err.println(file.prettyPrint());
+	}
+
+	@Test
+	public void testUncompress() throws Exception {
+		assumeTrue(Paths.get("ER0000.sl2.gz").toFile().exists(), "File does not exist");
+		SaveFile file = SaveFile.from(Paths.get("ER0000.sl2.gz"));
+		assertThat(file.validate()).isTrue();
+		if (!Paths.get("ER0000.sl2").toFile().exists()) {
+			file.save(Paths.get("ER0000.sl2"));
+			file = SaveFile.from(Paths.get("ER0000.sl2"));
+			assertThat(file.validate()).isTrue();
+		}
+		System.err.println(file.prettyPrint());
+	}
+
+	@Test
+	public void testLoadAndSave() throws Exception {
+		assumeTrue(Paths.get("ER0000.sl2.gz").toFile().exists(), "File does not exist");
+		SaveFile file = SaveFile.from(Paths.get("ER0000.sl2.gz"));
+		assertThat(file.validate()).isTrue();
+		file.save(Paths.get("ER0000.sl2.out.gz"));
+		file = SaveFile.from(Paths.get("ER0000.sl2.out.gz"));
+		assertThat(file.validate()).isTrue();
+		System.err.println(file.prettyPrint());
 	}
 
 	@Test
@@ -24,7 +53,7 @@ public class SaveFileTest {
 		SaveFile file = SaveFile.from(Paths.get("ER0000.sl2"));
 		int activeGameCount = file.getActiveCount();
 		SaveGame game = Arrays.asList(file.getGames()).stream().filter(g -> g != null && g.isActive())
-			.findFirst().get().named("TestCharacter");
+				.findFirst().get().named("TestCharacter");
 		int inactive = file.findInactive();
 		file.replaceSlot(inactive, game);
 		assertThat(file.validate()).isTrue();
@@ -43,7 +72,7 @@ public class SaveFileTest {
 		assumeTrue(Paths.get("ER0000.sl2").toFile().exists(), "File does not exist");
 		SaveFile file = SaveFile.from(Paths.get("ER0000.sl2"));
 		SaveGame game = Arrays.asList(file.getGames()).stream().filter(g -> g != null && g.isActive())
-			.findFirst().get().named("TestCharacter");
+				.findFirst().get().named("TestCharacter");
 		game = game.respec(new Status(99, 99, 99, 99, 99, 99, 99, 99));
 		int slot = file.findInactive();
 		file.replaceSlot(slot, game);

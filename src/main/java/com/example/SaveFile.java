@@ -1,12 +1,18 @@
 package com.example;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.stream.Collectors;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 public class SaveFile {
 
@@ -45,20 +51,42 @@ public class SaveFile {
 
 	public static SaveFile from(Path path) {
 		try {
-			return SaveFile.from(ByteBuffer.wrap(Files.readAllBytes(path)).order(ByteOrder.LITTLE_ENDIAN));
+			return SaveFile.from(ByteBuffer.wrap(readBytes(path)).order(ByteOrder.LITTLE_ENDIAN));
 		} catch (IOException e) {
 			return null;
 		}
 	}
 
+	private static byte[] readBytes(Path path) throws IOException {
+		byte[] bytes = Files.readAllBytes(path);
+		if (path.toString().endsWith(".gz")) {
+			ByteArrayOutputStream out = new ByteArrayOutputStream();
+			new GZIPInputStream(new ByteArrayInputStream(bytes)).transferTo(out);
+			return out.toByteArray();
+		}
+		return bytes;
+	}
+
 	public void save(Path path) {
 		try {
-			Files.write(path, data.array());
+			writeBytes(path, data.array());
 		} catch (IOException e) {
 			throw new IllegalStateException(e);
 		}
 	}
-	
+
+	private static void writeBytes(Path path, byte[] bytes) throws IOException {
+		if (path.toString().endsWith(".gz")) {
+			ByteArrayOutputStream out = new ByteArrayOutputStream();
+			GZIPOutputStream zip = new GZIPOutputStream(out);
+			zip.write(bytes);
+			zip.flush();
+			zip.close();
+			bytes = out.toByteArray();
+		}
+		Files.write(path, bytes);
+	}
+
 	public static SaveFile from(ByteBuffer data) {
 		SaveFile file = new SaveFile();
 		if (file.load(data)) {

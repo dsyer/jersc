@@ -14,7 +14,7 @@ Build the project with `./mvnw package`. You can run it with `java -jar target/*
 
 ## Usage
 
-Basic usage is to scan a file to inspect the character slots - just exit with `Ctrl-C` or enter "n" when prompted:
+Basic usage is to scan a file to inspect the character slots - just exit with `Ctrl-C` or enter "n" when prompted. File names ending in ".gz" will be treated as compressed (saving 90% of disk space for a typical ER save file). Example (assuming `ER0000.sl2` exists in the current directory):
 
 ```bash
 $ ./jersc 
@@ -24,7 +24,7 @@ Slot=0: Foo=[Level=99,Played=1534s]
 Do you want to copy a game from the file (Y/n)? n
 ```
 
-You can also copy a game slot, duplicating it into an existing slot. Example (assuming `ER0000.sl2.out` does not exist):
+You can also copy a game slot, duplicating it into an existing slot (using a file name ending in ".gz" will cause the output to be compressed). You can overwite the existing file if you want to, but by default a different filename is used, just in case you change your mind. Example (assuming `ER0000.sl2.out` does not exist):
 
 ```bash
 $ ./jersc 
