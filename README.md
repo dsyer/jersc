@@ -32,8 +32,8 @@ Input file (ER0000.sl2)?
 SaveFile: [id=76561197960267366, valid=true]
 Slot=0: Foo=[Level=99,Played=1534s]
 Do you want to copy a game from the file (Y/n)? 
-Output file (ER0000.sl2.out)? 
 Which slot do you want to copy from [0]? 
+Output file (ER0000.sl2.out)? 
 Writing to:
 SaveFile: [id=76561197960267366, valid=true]
 Slot=0: Foo=[Level=99,Played=1534s]
@@ -54,10 +54,10 @@ Input file (ER0000.sl2)?
 SaveFile: [id=76561197960267366, valid=true]
 Slot=0: Foo=[Level=99,Played=1534s]
 Do you want to copy a game from the file (Y/n)? 
+Which slot do you want to copy from [0]? 
 Output file (ER0000.sl2.out)? 
 File ER0000.sl2.out already exists.
 Do you want to overwrite this file (Y/n)? 
-Which slot do you want to copy from [0]? 
 Writing to:
 SaveFile: [id=76561199114987181, valid=true]
 Slot=0: BigFish=[Level=197,Played=646829s]
@@ -79,8 +79,7 @@ If you answer "Y" to the prompt to inspect the status, you will see the characte
 
 ```bash
 ...
-Do you want to inspect the status (Y/n)?
-Do you want to inspect the status (Y/n)? 
+Do you want to inspect the stats (Y/n)? 
 Status[VIG=50, MND=40, END=30, STR=40, DEX=40, INT=80, FTH=40, ARC=30], level=271
 Enter updates as name=quantity,name=quantity (or empty to skip) ()? STR=50,DEX=50
 Respec to: Status[VIG=50, MND=40, END=30, STR=50, DEX=50, INT=80, FTH=40, ARC=30] (Y/n)?

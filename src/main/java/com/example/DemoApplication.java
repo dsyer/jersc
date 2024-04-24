@@ -66,6 +66,11 @@ public class DemoApplication {
 		if (!confirm("Do you want to copy a game from the file")) {
 			return;
 		}
+		int slot = select("Which slot do you want to copy from", activeSlots(save));
+		if (slot < 0 || slot >= save.getGames().length || !save.getGames()[slot].isActive()) {
+			System.out.println("Invalid slot " + slot);
+			return;
+		}
 		output = new File(accept("Output file", output.getPath()));
 		SaveFile result = null;
 		if (output.exists()) {
@@ -78,11 +83,6 @@ public class DemoApplication {
 			result = save.copy();
 		}
 		save.changeId(result.getId());
-		int slot = select("Which slot do you want to copy from", activeSlots(save));
-		if (slot < 0 || slot >= save.getGames().length || !save.getGames()[slot].isActive()) {
-			System.out.println("Invalid slot " + slot);
-			return;
-		}
 		System.out.println("Writing " + save.getGames()[slot].getCharacterName() + " to:");
 		System.out.println(result.prettyPrint());
 		int target = select("Which slot do you want to copy to", slots(result));
@@ -93,7 +93,7 @@ public class DemoApplication {
 		SaveGame game = save.getGames()[slot];
 		String name = accept("New name for character", game.getCharacterName());
 		game = game.named(name);
-		if (confirm("Do you want to inspect the status")) {
+		if (confirm("Do you want to inspect the stats")) {
 			Status status = game.getStatus();
 			System.out.println(status.prettyPrint());
 
