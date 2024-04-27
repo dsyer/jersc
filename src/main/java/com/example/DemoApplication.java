@@ -35,7 +35,7 @@ public class DemoApplication {
 	}
 
 	private String[] lines(String message) {
-		System.out.println(message + " (empty line to end input):");
+		System.out.println(message + "\n(empty line to end input):");
 		List<String> lines = new ArrayList<>();
 		String line = scanner.nextLine();
 		while (!line.isEmpty()) {
@@ -131,13 +131,13 @@ public class DemoApplication {
 			}
 			if (confirm("Do you want to update the inventory")) {
 
-				String[] updates = lines("Enter inventory updates as name, quantity");
+				String[] updates = lines("Enter inventory updates one per line as\n\nname, quantity\n\nor\n\nname, new_name, quantity\n");
 				for (String line : updates) {
 					if (!line.contains(",")) {
 						continue;
 					}
 					try {
-						String key = line.substring(0, line.lastIndexOf(",")).trim();
+						String key = line.substring(0, line.indexOf(",")).trim();
 						String raw = key;
 						if (key.startsWith("\"")) {
 							key = key.substring(1);
@@ -145,9 +145,22 @@ public class DemoApplication {
 						}
 						int value = Integer.parseInt(line.substring(line.lastIndexOf(",") + 1).trim());
 						Item item = Items.DEFAULT.find(key);
+						Item newItem = item;
+						if (line.indexOf(",") != line.lastIndexOf(",")) {
+							String newKey = line.substring(line.indexOf(",") + 1, line.lastIndexOf(",")).trim();
+							if (newKey.startsWith("\"")) {
+								newKey = newKey.substring(1);
+								newKey = newKey.substring(0, newKey.length() - 1);
+							}
+							newItem = Items.DEFAULT.find(newKey);
+							if (newItem == null) {
+								System.out.println("Could not find: " + newKey);
+								newItem = item;
+							}
+						}
 						if (item != null) {
-							game = game.updateItem(item, value);
-							System.out.println("Updated: " + raw + ", " + value);
+							game = game.updateItem(item, newItem, value);
+							System.out.println("Updated: " + newItem.name() + ", " + value);
 						} else {
 							System.out.println("Unknown item: " + raw);
 						}

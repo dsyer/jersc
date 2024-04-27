@@ -108,11 +108,19 @@ Tarnished Wizened Finger, 1
 Tarnisheds Furled Finger, 1
 Throwing Dagger, 40
 Do you want to update the inventory (Y/n)? 
-Enter inventory updates as name, quantity (empty line to end input):
+Enter inventory updates one per line as
+
+name, quantity
+
+or
+
+name, new_name, quantity
 Rowa Fruit, 100
+Erdleaf Flower, Lords Rune, 99
 
 Updated: Rowa Fruit, 100
+Updated: Lords Rune, 99
 ...
 ```
 
-The name of the item has to match the printed output and you can't add items that are not already in your inventory (any line of input that doesn't match an existing item will be ignored). Also be careful how large the quantity is because the game has different limits for different items and the app doesn't know how to enforce them. Crafting items are generally limited to 999, tools mostly 99, but with quite a few expceptions. Key items are usually limited to 1 as are re-usable tools (e.g. Tarnished Wizened Finger). Check in the game to see what the limits are for the items you want to add.
+The name of the item has to match the printed output and you can't add items that are not already in your inventory except by replacing an existing item, as in the example (any line of input that doesn't match an existing item will be ignored). Also be careful how large the quantity is because the game has different limits for different items and the app doesn't know how to enforce them. Crafting items are generally limited to 999, tools mostly 99, but with quite a few expceptions. Key items are usually limited to 1 as are re-usable tools (e.g. Tarnished Wizened Finger). Check in the game to see what the limits are for the items you want to add.

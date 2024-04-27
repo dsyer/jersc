@@ -152,6 +152,10 @@ public class SaveGame {
 	}
 
 	public SaveGame updateItem(Item item, int quantity) {
+		return updateItem(item, item, quantity);
+	}
+
+	public SaveGame updateItem(Item item, Item update, int quantity) {
 		ItemData target = null;
 		for (ItemData data : getInventory()) {
 			if (data.item().equals(item)) {
@@ -162,11 +166,12 @@ public class SaveGame {
 		if (target == null) {
 			return null;
 		}
-		if (target.quantity() == quantity) {
+		if (target.quantity() == quantity && item.equals(update)) {
 			return this;
 		}
 		if (quantity > 999) {
-			// They might overflow into the stored slot? Not sure. Also what about tools (limit 99) 
+			// They might overflow into the stored slot? Not sure. Also what about tools
+			// (limit 99)
 			// or key items (limit 1)?
 			quantity = 999;
 		}
@@ -174,7 +179,9 @@ public class SaveGame {
 		SaveGame copy = copy();
 		byte[] saved = copy.saveData.getData();
 		// Copy the change in ItemData into the save data
-		ByteBuffer.wrap(saved).order(ByteOrder.LITTLE_ENDIAN).putShort(target.address() + 4, (short)quantity);
+		ByteBuffer.wrap(saved).order(ByteOrder.LITTLE_ENDIAN)
+			.put(target.address(), update.id())
+			.putShort(target.address() + 4, (short) quantity);
 		// Rehash
 		copy.saveData.reverify();
 		return copy;
@@ -226,10 +233,12 @@ public class SaveGame {
 						// We found a known item, so extract the quantity
 						list.add(new ItemData(item, wrapper.getShort(4), data.position() - slice.length, slice));
 						if (debug) {
-							System.err.println((data.position() - slice.length) + " " + item + ": " + wrapper.getShort(4) + ", " + Arrays.toString(slice));
+							System.err.println((data.position() - slice.length) + " " + item + ": "
+									+ wrapper.getShort(4) + ", " + Arrays.toString(slice));
 						}
 					} else if (debug) {
-						System.err.println((data.position() - slice.length) + " ? " + Arrays.toString(id) + ": " + wrapper.getShort(4) + ", "
+						System.err.println((data.position() - slice.length) + " ? " + Arrays.toString(id) + ": "
+								+ wrapper.getShort(4) + ", "
 								+ Arrays.toString(slice));
 					}
 				}
@@ -244,7 +253,8 @@ public class SaveGame {
 	}
 
 	public SaveGame respec(Status status) {
-		if (status == null || (getStatus()!=null && status.equals(this.status.status()) && status.level() == characterLevel)) {
+		if (status == null
+				|| (getStatus() != null && status.equals(this.status.status()) && status.level() == characterLevel)) {
 			// Nothing to do
 			return this;
 		}
@@ -269,30 +279,30 @@ public class SaveGame {
 			}
 			return new StatusData(status, data, address);
 		}
-	
+
 		public StatusData respec(Status status) {
-			data.putShort(address + 0, (short)status.VIG());
-			data.putShort(address + 4, (short)status.MND());
-			data.putShort(address + 8, (short)status.END());
-			data.putShort(address + 12, (short)status.STR());
-			data.putShort(address + 16, (short)status.DEX());
-			data.putShort(address + 20, (short)status.INT());
-			data.putShort(address + 24, (short)status.FTH());
-			data.putShort(address + 28, (short)status.ARC());
-			data.putShort(address + 44, (short)status.level());
+			data.putShort(address + 0, (short) status.VIG());
+			data.putShort(address + 4, (short) status.MND());
+			data.putShort(address + 8, (short) status.END());
+			data.putShort(address + 12, (short) status.STR());
+			data.putShort(address + 16, (short) status.DEX());
+			data.putShort(address + 20, (short) status.INT());
+			data.putShort(address + 24, (short) status.FTH());
+			data.putShort(address + 28, (short) status.ARC());
+			data.putShort(address + 44, (short) status.level());
 			updateStats(-8, status.st());
 			updateStats(-24, status.fp());
 			updateStats(-36, status.hp());
 			return new StatusData(status, data, address);
 		}
-	
+
 		private void updateStats(int offset, int level) {
 			// This is the base stat.
-			data.putShort(address + offset, (short)level);
+			data.putShort(address + offset, (short) level);
 			// We have to assume the other two are going to be adjusted by the game.
-			data.putShort(address + offset - 4, (short)level);
-			data.putShort(address + offset - 8, (short)level);
+			data.putShort(address + offset - 4, (short) level);
+			data.putShort(address + offset - 8, (short) level);
 		}
-		
+
 	}
 }
