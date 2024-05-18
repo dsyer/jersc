@@ -78,6 +78,11 @@ public class DemoApplication {
 				return;
 			}
 			result = SaveFile.from(output.toPath());
+			System.out.println("Existing content:");
+			System.out.println(result.prettyPrint());
+			if (accept("Do you want to update or replace this file", "U/r").toLowerCase().startsWith("r")) {
+				result = null;
+			}
 		}
 		if (result == null) {
 			result = save.copy();

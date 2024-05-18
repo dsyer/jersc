@@ -58,7 +58,13 @@ Which slot do you want to copy from [0]?
 Output file (ER0000.sl2.out)? 
 File ER0000.sl2.out already exists.
 Do you want to overwrite this file (Y/n)? 
-Writing to:
+Existing content:
+SaveFile: [id=76561199114987181, valid=true]
+Slot=0: BigFish=[Level=197,Played=646829s]
+Slot=1: RedFish=[Level=138,Played=165214s]
+Slot=2: LittleFish=[Level=184,Played=573239s]
+Do you want to update or replace this file (U/r)?
+Writing Foo to:
 SaveFile: [id=76561199114987181, valid=true]
 Slot=0: BigFish=[Level=197,Played=646829s]
 Slot=1: RedFish=[Level=138,Played=165214s]
