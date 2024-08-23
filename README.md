@@ -4,9 +4,9 @@ This project is a library and command line application (written in Java) for rea
 
 Locate your save file and (optionally) copy it to an empty directory. The save file from the game is `ER0000.sl2` typically located in a folder called `AppData/Roaming/EldenRing/<steamid>`. On Windows you can usually find it at `C:\Users\<username>/` and on Steam Deck it will be in a Proton virtual drive `/home/deck/.steam/steam/steamapps/compatdata/1245620/pfx/drive_c/users/steamuser/`. The `steamid` is a 17-digit number that corresponds to your Steam account - you can see it in your profile details in the Steam web UI at https://store.steampowered.com/account/ - and `1245620` is a unique identifier for Elden Ring. The `ER0000.sl2` file is a binary file that contains your character slots.
 
-You don't have to run the application on the same machine as where you play the game. Steam Decks are fine for running Java but if you want to develop new features it might be easier to copy the file over. What I do with my Steam Deck is [enable SSH](https://shendrick.net/Gaming/2022/05/30/sshonsteamdeck.html) and then copy the save file to my laptop with `scp`. You can also use a USB stick to copy the file between the Steam Deck and your computer.
+You don't have to run the application on the same machine as where you play the game. Steam Decks are fine for running Java but if you want to develop new features it might be easier to copy the file over. What I do with my Steam Deck is [enable SSH](https://shendrick.net/Gaming/2022/05/30/sshonsteamdeck.html) then `sudo systemctl start sshd` and copy the save file to my laptop with `scp`. You can of course use a USB stick to copy the file between the Steam Deck and your computer.
 
-You can also download other player's save files from the internet and copy their characters into your save file (e.g. at [Nexusmods](https://www.nexusmods.com/eldenring/mods/categories/10/)). This is useful for trying out different builds or for recovering a lost character, but be careful if you don't know the other player because there might (allegedly) be stuff in other people's save files that could get you banned from multiplayer. You can also use the application to copy your characters between different computers or operating systems, but if that's all you need Steam Cloud works fine for me.
+You can also download other player's save files from the internet and copy their characters into your save file (e.g. at [Nexusmods](https://www.nexusmods.com/eldenring/mods/categories/10/)). This is useful for trying out different builds or for recovering a lost character, but be careful if you don't know the other player because there might (allegedly) be stuff in other people's save files that could get you banned from multiplayer. You can use the application to copy your characters between different computers or operating systems, but if that's all you need Steam Cloud works fine for me.
 
 ## Installation
 
@@ -46,7 +46,7 @@ Slot=0: Foo=[Level=99,Played=1534s]
 Slot=1: Bar=[Level=99,Played=1534s]
 Continue (Y/n)?
 ```
-You can also copy a game slot from one file to another. The output file will be from the steam id that you intend to play with. The input file could be from someone else, and you can adopt their character including all the stats and inventory.  Here we copy a game from a file, updating the player ID and saving it into an empty slot in an existing save file (assuming `ER0000.sl2.out` already exists):
+If the output file already exists, you can copy a game slot from one file to another. The output file will be from the steam id that you intend to play with. The input file could be from someone else, and you can adopt their character including all the stats and inventory.  Here we copy a game from a file, updating the player ID and saving it into an empty slot in an existing save file (assuming `ER0000.sl2.out` already exists):
 
 ```bash
 $ ./jersc 
@@ -129,4 +129,4 @@ Updated: Lords Rune, 99
 ...
 ```
 
-The name of the item has to match the printed output and you can't add items that are not already in your inventory except by replacing an existing item, as in the example (any line of input that doesn't match an existing item will be ignored). Also be careful how large the quantity is because the game has different limits for different items and the app doesn't know how to enforce them. Crafting items are generally limited to 999, tools mostly 99, but with quite a few expceptions. Key items are usually limited to 1 as are re-usable tools (e.g. Tarnished Wizened Finger). Check in the game to see what the limits are for the items you want to add.
+The name of the item has to match the printed output and you can't add items that are not already in your inventory except by replacing an existing item, as in the example (any line of input that doesn't match an existing item will be ignored). Also be careful how large the quantity is because the game has different limits for different items and the app doesn't know how to enforce them. Crafting items are generally limited to 999, tools mostly 99, but with quite a few exceptions. Key items are usually limited to 1 as are re-usable tools (e.g. Tarnished Wizened Finger). Check in the game to see what the limits are for the items you want to add.
