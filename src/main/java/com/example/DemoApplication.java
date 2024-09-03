@@ -112,7 +112,7 @@ public class DemoApplication {
 			return;
 		}
 		SaveGame game = save.getGames()[slot];
-		String name = accept("New name for character", this.name !=null ? this.name : save.getGames()[target].getCharacterName());
+		String name = accept("New name for character", name(save, target));
 		game = game.named(name);
 		if (confirm("Do you want to inspect the stats")) {
 			Status status = game.getStatus();
@@ -199,6 +199,17 @@ public class DemoApplication {
 		}
 		result.save(output.toPath());
 		System.out.println("Saved " + output);
+	}
+
+	private String name(SaveFile save, int target) {
+		if (this.name != null) {
+			return this.name;
+		} 
+		SaveGame game = save.getGames()[target];
+		if (game.isActive()) {
+			return game.getCharacterName();
+		}
+		return "Slot" + target;
 	}
 
 	private List<Integer> slots(SaveFile save) {

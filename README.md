@@ -22,7 +22,7 @@ Usage: jersc [-y] [-i slot] [-o slot]
   -y: no wait for user input
   -i slot: input slot (integer, default 0)
   -o slot: output slot (integer, default 1)
-  -n name: new name for character (default to existing output slot name if it exists)
+  -n name: new name for character (default to existing output slot name if it is active)
 ```
 
 Example (assuming `ER0000.sl2` exists in the current directory):
