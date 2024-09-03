@@ -14,7 +14,18 @@ Build the project with `./mvnw package`. You can run it with `java -jar target/*
 
 ## Usage
 
-Basic usage is to scan a file to inspect the character slots - just exit with `Ctrl-C` or enter "n" when prompted. File names ending in ".gz" will be treated as compressed (saving 90% of disk space for a typical ER save file). Example (assuming `ER0000.sl2` exists in the current directory):
+Basic usage is to scan a file to inspect the character slots - just exit with `Ctrl-C` or enter "n" when prompted. File names ending in ".gz" will be treated as compressed (saving 90% of disk space for a typical ER save file). The default is to prompt on the command line for responses and confirmations. You can skip the prompts with "-y" as a command line argument, and by providing some of the responses as command line arguments:
+
+```
+$ java -jar target/jersc-0.0.1-SNAPSHOT-exec.jar -h
+Usage: jersc [-y] [-i slot] [-o slot]
+  -y: no wait for user input
+  -i slot: input slot (integer, default 0)
+  -o slot: output slot (integer, default 1)
+  -n name: new name for character (default to existing output slot name if it exists)
+```
+
+Example (assuming `ER0000.sl2` exists in the current directory):
 
 ```bash
 $ ./jersc 

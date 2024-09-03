@@ -14,12 +14,22 @@ public class DemoApplication {
 
 	private Scanner scanner = new Scanner(System.in);
 
+	private boolean nowait;
+
+	private int fromSlot = 0;
+
+	private int toSlot = 1;
+
+	private String name = null;
+
 	private boolean confirm(String message) {
 		System.out.print(message + " (Y/n)? ");
-		String line = scanner.nextLine();
-		if (!line.isEmpty()) {
-			if (line.toLowerCase().charAt(0) == 'n') {
-				return false;
+		if (!nowait) {
+			String line = scanner.nextLine();
+			if (!line.isEmpty()) {
+				if (line.toLowerCase().charAt(0) == 'n') {
+					return false;
+				}
 			}
 		}
 		return true;
@@ -27,9 +37,11 @@ public class DemoApplication {
 
 	private String accept(String message, String fallback) {
 		System.out.print(message + " (" + fallback + ")? ");
-		String line = scanner.nextLine();
-		if (!line.isEmpty()) {
-			return line;
+		if (!nowait) {
+			String line = scanner.nextLine();
+			if (!line.isEmpty()) {
+				return line;
+			}
 		}
 		return fallback;
 	}
@@ -37,20 +49,24 @@ public class DemoApplication {
 	private String[] lines(String message) {
 		System.out.println(message + "\n(empty line to end input):");
 		List<String> lines = new ArrayList<>();
-		String line = scanner.nextLine();
-		while (!line.isEmpty()) {
-			lines.add(line);
-			line = scanner.nextLine();
+		if (!nowait) {
+			String line = scanner.nextLine();
+			while (!line.isEmpty()) {
+				lines.add(line);
+				line = scanner.nextLine();
+			}
 		}
 		return lines.toArray(new String[0]);
 	}
 
-	private int select(String message, List<Integer> options) {
-		System.out.print(message + " " + options + "? ");
-		int result = options.get(0);
-		String line = scanner.nextLine();
-		if (!line.isEmpty()) {
-			result = Integer.parseInt(line);
+	private int select(String message, List<Integer> options, int defaultValue) {
+		System.out.print(message + " " + options + " (" + defaultValue + ")? ");
+		int result = defaultValue;
+		if (!nowait) {
+			String line = scanner.nextLine();
+			if (!line.isEmpty()) {
+				result = Integer.parseInt(line);
+			}
 		}
 		return result;
 	}
@@ -66,7 +82,7 @@ public class DemoApplication {
 		if (!confirm("Do you want to copy a game from the file")) {
 			return;
 		}
-		int slot = select("Which slot do you want to copy from", activeSlots(save));
+		int slot = select("Which slot do you want to copy from", activeSlots(save), fromSlot);
 		if (slot < 0 || slot >= save.getGames().length || !save.getGames()[slot].isActive()) {
 			System.out.println("Invalid slot " + slot);
 			return;
@@ -90,13 +106,13 @@ public class DemoApplication {
 		save.changeId(result.getId());
 		System.out.println("Writing " + save.getGames()[slot].getCharacterName() + " to:");
 		System.out.println(result.prettyPrint());
-		int target = select("Which slot do you want to copy to", slots(result));
+		int target = select("Which slot do you want to copy to", slots(result), toSlot);
 		if (target < 0 || target >= result.getGames().length) {
 			System.out.println("Invalid slot " + target);
 			return;
 		}
 		SaveGame game = save.getGames()[slot];
-		String name = accept("New name for character", game.getCharacterName());
+		String name = accept("New name for character", this.name !=null ? this.name : save.getGames()[target].getCharacterName());
 		game = game.named(name);
 		if (confirm("Do you want to inspect the stats")) {
 			Status status = game.getStatus();
@@ -136,7 +152,8 @@ public class DemoApplication {
 			}
 			if (confirm("Do you want to update the inventory")) {
 
-				String[] updates = lines("Enter inventory updates one per line as\n\nname, quantity\n\nor\n\nname, new_name, quantity\n");
+				String[] updates = lines(
+						"Enter inventory updates one per line as\n\nname, quantity\n\nor\n\nname, new_name, quantity\n");
 				for (String line : updates) {
 					if (!line.contains(",")) {
 						continue;
@@ -208,15 +225,41 @@ public class DemoApplication {
 
 	public static void main(String[] args) throws IOException {
 		DemoApplication application = new DemoApplication();
+		try {
+			for (int i = 0; i < args.length; i++) {
+				if (args[i].equals("-h")) {
+					usage();
+					return;
+				}
+				if (args[i].equals("-y")) {
+					application.nowait = true;
+				}
+				if (args[i].equals("-i")) {
+					application.fromSlot = Integer.parseInt(args[i + 1]);
+					i++;
+				}
+				if (args[i].equals("-o")) {
+					application.toSlot = Integer.parseInt(args[i + 1]);
+					i++;
+				}
+				if (args[i].equals("-n")) {
+					application.name = args[i + 1];
+					i++;
+				}
+			}
+		} catch (NumberFormatException e) {
+			usage();
+			return;
+		}
 		application.run();
 	}
 
-	void parse(String[] args) {
-		if (args.length > 0) {
-			input = new File(args[0]);
-		}
-		if (args.length > 1) {
-			output = new File(args[1]);
-		}
+	private static void usage() {
+		System.out.println("Usage: jersc [-y] [-i slot] [-o slot]");
+		System.out.println("  -y: do not wait for user input");
+		System.out.println("  -i slot: input slot (integer, default 0)");
+		System.out.println("  -o slot: output slot (integer, default 1)");
+		System.out.println("  -n name: new name for character (default to existing output slot name if it exists)");
 	}
+
 }
