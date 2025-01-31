@@ -3,6 +3,7 @@ package com.example;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.nio.file.Paths;
+import java.util.HexFormat;
 
 import org.junit.jupiter.api.Test;
 
@@ -12,7 +13,7 @@ public class ItemsTest {
     public void testReadFile() {
         Items items = Items.read(Paths.get("src/main/resources/items.csv"));
         assertThat(items).isNotNull();
-        Item item = items.find("Trinas Lily");
+        Item item = items.find("Trina's Lily");
         assertThat(item).isNotNull();
         assertThat(items.find(item.id())).isEqualTo(item);
     }
@@ -37,7 +38,7 @@ public class ItemsTest {
     public void testFindById() throws Exception {
         Items items = Items.DEFAULT;
         assertThat(items).isNotNull();
-        byte[] id = new byte[] {115, 0};
+        byte[] id = HexFormat.of().parseHex("A3D21EB0");
         assertThat(items.find(id)).isNotNull();
     }
 }

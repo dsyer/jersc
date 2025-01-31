@@ -180,8 +180,8 @@ public class SaveGame {
 		byte[] saved = copy.saveData.getData();
 		// Copy the change in ItemData into the save data
 		ByteBuffer.wrap(saved).order(ByteOrder.LITTLE_ENDIAN)
-			.put(target.address(), update.id())
-			.putShort(target.address() + 4, (short) quantity);
+				.put(target.address(), update.id())
+				.putShort(target.address() + 4, (short) quantity);
 		// Rehash
 		copy.saveData.reverify();
 		return copy;
@@ -222,24 +222,20 @@ public class SaveGame {
 			// Check a maximum of 2048 potential items.
 			for (int pointer = 0; pointer < 2048; pointer++) {
 				byte[] slice = new byte[12];
-				byte[] id = new byte[2];
+				byte[] id = new byte[4];
 				data.get(slice);
 				id[0] = slice[0];
 				id[1] = slice[1];
-				if (slice[2] == 0 && slice[3] == (byte) 0xB0) { // or 0x80, 0x80?
-					Item item = Items.DEFAULT.find(id);
+				id[2] = slice[2];
+				id[3] = slice[3];
+				Item item = Items.DEFAULT.find(id);
+				if (item != null) {
 					ByteBuffer wrapper = ByteBuffer.wrap(slice).order(ByteOrder.LITTLE_ENDIAN);
-					if (item != null) {
-						// We found a known item, so extract the quantity
-						list.add(new ItemData(item, wrapper.getShort(4), data.position() - slice.length, slice));
-						if (debug) {
-							System.err.println((data.position() - slice.length) + " " + item + ": "
-									+ wrapper.getShort(4) + ", " + Arrays.toString(slice));
-						}
-					} else if (debug) {
-						System.err.println((data.position() - slice.length) + " ? " + Arrays.toString(id) + ": "
-								+ wrapper.getShort(4) + ", "
-								+ Arrays.toString(slice));
+					// We found a known item, so extract the quantity
+					list.add(new ItemData(item, wrapper.getShort(4), data.position() - slice.length, slice));
+					if (debug) {
+						System.err.println((data.position() - slice.length) + " " + item + ": "
+								+ wrapper.getShort(4) + ", " + Arrays.toString(slice));
 					}
 				}
 				// Move to the next item potential location
@@ -250,6 +246,7 @@ public class SaveGame {
 		}
 		this.inventory = list.toArray(new ItemData[0]);
 		return this.inventory;
+
 	}
 
 	public SaveGame respec(Status status) {

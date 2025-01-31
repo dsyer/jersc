@@ -4,19 +4,19 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HexFormat;
 import java.util.Iterator;
 import java.util.Map;
 
 public class Items implements Iterable<Item> {
-
+    
     private Map<String, Item> names = new HashMap<>();
     private Map<ByteArrayWrapper, Item> ids = new HashMap<>();
+    private static HexFormat FORMAT = HexFormat.of();
 
     public static Items DEFAULT;
 
@@ -79,8 +79,15 @@ public class Items implements Iterable<Item> {
             return null;
         }
         String data[] = columns(csv);
-        Item result = new Item(data[0],
-                new byte[] { (byte) Integer.parseInt(data[1]), (byte) Integer.parseInt(data[2]) });
+        data[1] = data[1].trim();
+        if (data[1].length() == 0) {
+            return null;
+        }
+        if (data[1].length()%2 == 1) {
+            data[1] = "0" + data[1];
+        }
+        System.err.println("Data: " + Arrays.toString(data));
+        Item result = new Item(data[0], FORMAT.parseHex(data[1]), data[2]);
         return result;
     }
 

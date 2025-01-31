@@ -1,4 +1,5 @@
-Name, ID1, ID2
-"O, Flame!", 113, 23
-"Ash of War: Impaling Thrust", 116, 39
-"Black Knife", 80, 105
+Name, ID, Type
+Throwing Dagger,A40600B0,Item
+Toxic Mossling,AAD21EB0,Consumable
+Toxic Mushroom,225100B0,Material
+"O, Flame!",235100B0,Not Really
