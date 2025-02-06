@@ -4,6 +4,7 @@ mkShell {
     zlib.static
     gcc
     jbang
+    graalvm-ce
    ];
 }
 
