@@ -86,7 +86,6 @@ public class Items implements Iterable<Item> {
         if (data[1].length()%2 == 1) {
             data[1] = "0" + data[1];
         }
-        System.err.println("Data: " + Arrays.toString(data));
         Item result = new Item(data[0], FORMAT.parseHex(data[1]), data[2]);
         return result;
     }
